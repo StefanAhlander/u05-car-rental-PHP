@@ -1,0 +1,66 @@
+:root {
+  --main-bg-color: rgb(245, 245, 245);
+  --dark-bg-color: darkslategrey;
+  --bso: 3px; /* box-shadow-offset */
+  --bsl: rgba(255, 255, 255, 1); /* box-shadow-light color */
+  --bsd: rgbs(0, 0, 0, 0.3); /* box-shadow-dark color */
+  --font-family: Arial, Helvetica, sans-serif;
+}
+
+html * {
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--main-bg-color);
+}
+
+header h1 {
+  font-size: 1.5em;
+  text-align: center;
+}
+
+nav {
+  border-bottom: 3px solid var(--dark-bg-color);
+  padding: 1em;
+  text-align: center;
+}
+
+nav form {
+  display: inline;
+  margin-right: 1em;
+}
+
+nav form input {
+  padding: 0.5em;
+  background-color: transparent;
+  border-radius: 5px;
+  box-shadow: var(--bso) var(--bso) var(--bso) 0 var(--bsd),
+    -var(--bso) -var(--bso) -var(--bso) 0 var(--bsl);
+}
+
+main {
+  margin: 1em auto;
+  max-width: 900px;
+}
+
+footer {
+  bottom: 0;
+  position: absolute;
+}
+
+.background-dark {
+  background-color: var(--dark-bg-color);
+  color: antiquewhite;
+  padding: 1em;
+  width: 100%;
+}
+
+.copyright {
+  font-size: 1em;
+  text-align: right;
+}
