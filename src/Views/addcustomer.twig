@@ -1,0 +1,47 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Add customer
+{% endblock %}
+
+{% block content %}
+<h2>Add customer</h2>
+
+<form class="customerform" method="post" action="/addedcustomer">
+  <ul>
+    <li>
+      <label for="personnumber">Person number:</label>
+      <input type="text" name="personnumber">
+      <span>Add a valid personal number.</span>
+    </li>
+    
+    <li>
+      <label for="name">Name:</label>
+      <input type="text" name="name">
+      <span>Add full name.</span>
+   </li>
+    
+    <li>
+      <label for="address">Address:</label>
+      <input type="text" name="address">
+      <span>Add street address.</span>
+    </li>
+    
+    <li>
+      <label for="postaladdress">Postal Address:</label>
+      <input type="text" name="postaladdress">
+       <span>Add postal number and city.</span>
+   </li>
+  
+    <li>
+      <label for="phonenumber">Phonenumber:</label>
+      <input type="text" name="phonenumber">
+      <span>Add phonenumber.</span>
+    </li>
+
+    <li>
+      <input type="submit" value="Save customer" >
+    </li>
+  </ul>
+</form>
+{% endblock %}

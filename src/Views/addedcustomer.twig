@@ -1,0 +1,31 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Added customer
+{% endblock %}
+
+{% block content %}
+  <h2>Customer Added</h2>
+
+  <table>
+    <thead>
+      <th>Person Number</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Postal Address</th>
+      <th>Phonenumber</th>
+      <th></th>
+      <th></th>
+    </thead>
+
+    <tr>
+      <td>{{ customer.personnumber }}</td>
+      <td>{{ customer.name }}</td>
+      <td>{{ customer.address }}</td>
+      <td>{{ customer.postaladdress }}</td>
+      <td>{{ customer.phonenumber }}</td>
+      <td><a href="/editcustomer/{{ customer.personnumber }}">Edit</a></td>
+      <td><a href="/deletecustomer/{{ customer.personnumber }}">Delete</a></td>
+    </tr>
+  </table>
+{% endblock %}

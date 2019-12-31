@@ -33,8 +33,8 @@ CREATE TABLE rentals(
 ) ENGINE=InnoDb;
 
 INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber) VALUES
-  (7302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", 0704979766),
-  (8007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", 0725100580);
+  (197302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", 0704979766),
+  (198007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", 0725100580);
 
 INSERT INTO cars (registration, make, color, year, price) VALUES
   ("LSW364", "Toyota", "Gray", 2012, 500),

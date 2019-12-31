@@ -23,26 +23,27 @@
     "controller": "Rental",
     "method": "getHistory"
   },
-  "sales/:id": {
-    "controller": "Sales",
-    "method": "get",
-    "login": true,
+  "editcustomer/:personnumber": {
+    "controller": "Customer",
+    "method": "edit",
     "params": {
-      "id": "number"
+      "personnumber": "number"
     }
   },
-  "my-books": {
-    "controller": "Book",
-    "method": "getByUser",
-    "login": true
-  },
-  "book/:id/buy": {
-    "controller": "Sales",
-    "method": "add",
-    "login": true,
+  "deletecustomer/:personnumber": {
+    "controller": "Customer",
+    "method": "delete",
     "params": {
-      "id": "number"
+      "personnumber": "number"
     }
+  },
+  "addcustomer": {
+    "controller": "Customer",
+    "method": "add"
+  },
+  "addedcustomer": {
+    "controller": "Customer",
+    "method": "addedCustomer"
   },
   "book/:id/borrow": {
     "controller": "Book",
