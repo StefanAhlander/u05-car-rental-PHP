@@ -1,49 +1,25 @@
 <?php
 
-namespace Bookstore\Models;
+namespace Main\Models;
 
-use Bookstore\Domain\Customer;
-use Bookstore\Domain\Customer\CustomerFactory;
-use Bookstore\Exceptions\NotFoundException;
+use Main\Domain\Customer;
+use Main\Exceptions\DbException;
+use Main\Exceptions\NotFoundException;
+use PDO;
 
 class CustomerModel extends AbstractModel {
-    public function get(int $userId): Customer {
-        $query = 'SELECT * FROM customer WHERE customer_id = :user';
+    const CLASSNAME = '\Main\Domain\Customer';
+
+    public function getAll($page, $pageLength) {
+        $start = $pageLength * ($page - 1);
+
+        $query = 'SELECT * FROM customers LIMIT :page, :length';
         $sth = $this->db->prepare($query);
-        $sth->execute(['user' => $userId]);
-
-        $row = $sth->fetch();
-
-        if (empty($row)) {
-            throw new NotFoundException();
-        }
-
-        return CustomerFactory::factory(
-            $row['type'],
-            $row['id'],
-            $row['firstname'],
-            $row['surname'],
-            $row['email']
-        );
+        $sth->bindParam('page', $start, PDO::PARAM_INT);
+        $sth->bindParam('length', $pageLength, PDO::PARAM_INT);
+        $sth->execute();
+    
+        return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
     }
 
-    public function getByEmail(string $email): Customer {
-        $query = 'SELECT * FROM customer WHERE email = :user';
-        $sth = $this->db->prepare($query);
-        $sth->execute(['user' => $email]);
-
-        $row = $sth->fetch();
-
-        if (empty($row)) {
-            throw new NotFoundException();
-        }
-
-        return CustomerFactory::factory(
-            $row['type'],
-            $row['id'],
-            $row['firstname'],
-            $row['surname'],
-            $row['email']
-        );
-    }
 }

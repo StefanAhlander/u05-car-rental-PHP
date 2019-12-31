@@ -35,7 +35,8 @@ nav form {
   margin-right: 1em;
 }
 
-nav form input {
+nav form input,
+.btn-standard {
   padding: 0.5em;
   background-color: transparent;
   border-radius: 5px;
@@ -45,7 +46,7 @@ nav form input {
 
 main {
   margin: 1em auto;
-  max-width: 900px;
+  max-width: 960px;
 }
 
 footer {
@@ -63,4 +64,22 @@ footer {
 .copyright {
   font-size: 1em;
   text-align: right;
+}
+
+table {
+  margin-bottom: 1em;
+}
+
+thead {
+  background-color: var(--dark-bg-color);
+  color: antiquewhite;
+}
+
+tr:nth-child(even) {
+  background-color: #ddd;
+}
+
+th,
+td {
+  padding: 0.3em 0.5em;
 }

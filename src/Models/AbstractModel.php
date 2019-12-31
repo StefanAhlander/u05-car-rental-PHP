@@ -1,6 +1,6 @@
 <?php
 
-namespace Bookstore\Models;
+namespace Main\Models;
 
 use PDO;
 

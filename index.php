@@ -10,7 +10,7 @@ use Main\Utils\DependencyInjector;
 
   $dbConfig = $config->get('db');
   $db = new PDO(
-      'mysql:host=127.0.0.1;dbname=Cars',
+      'mysql:host=127.0.0.1;dbname=Cars;charset=utf8',
       $dbConfig['user'],
       $dbConfig['password']
   );

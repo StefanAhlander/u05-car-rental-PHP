@@ -1,12 +1,12 @@
 DROP database IF EXISTS Cars;
-CREATE database Cars;
+CREATE database Cars CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE Cars;
 
 CREATE TABLE customers(
   personnumber BIGINT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   address VARCHAR(255) NOT NULL,
-  postaladress VARCHAR(255) NOT NULL,
+  postaladdress VARCHAR(255) NOT NULL,
   phonenumber INT NOT NULL
 ) ENGINE=InnoDb;
 
@@ -32,7 +32,7 @@ CREATE TABLE rentals(
   FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
-INSERT INTO customers (personnumber, name, address, postaladress, phonenumber) VALUES
+INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber) VALUES
   (7302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", 0704979766),
   (8007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", 0725100580);
 
