@@ -1,11 +1,11 @@
 {% extends 'layout.twig' %}
 
 {% block title %}
-    Added customer
+    Edited customer
 {% endblock %}
 
 {% block content %}
-  <h2>Customer Added</h2>
+  <h2>Customer Edited</h2>
 
   <table>
     <thead>
@@ -25,13 +25,13 @@
       <td>{{ customer.postaladdress }}</td>
       <td>{{ customer.phonenumber }}</td>
       <td>
-        <form method="post" action="/editcustomer">
-          <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-          <input class="btn-standard" type="submit" value="Edit">
-        </form>
-      </td>
+      <form method="post" action="/editcustomer">
+        <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
+        <input class="btn-standard" type="submit" value="Edit">
+      </form>
+    </td>
       <td>
-        <form method="post" action="/deletecustomer">
+        <form method="post" action="/deletecustomer" >
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
           <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')">
         </form>

@@ -22,8 +22,18 @@
         <td>{{ customer.address }}</td>
         <td>{{ customer.postaladdress }}</td>
         <td>{{ customer.phonenumber }}</td>
-        <td><a href="/editcustomer/{{ customer.personnumber }}">Edit</a></td>
-        <td><a href="/deletecustomer/{{ customer.personnumber }}">Delete</a></td>
+        <td>
+          <form method="post" action="/editcustomer">
+            <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
+            <input class="btn-standard" type="submit" value="Edit">
+          </form>
+        </td>
+        <td>
+          <form method="post" action="/deletecustomer">
+            <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
+            <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')">
+          </form>
+        </td>
     </tr>
 {% endfor %}
 </table>

@@ -15,6 +15,47 @@ class CustomerController extends AbstractController {
     return $this->render('main.twig', $properties);
   }
 
+  public function editCustomer() {
+    $customerModel = new CustomerModel($this->db);
+
+    $fM =  new FilteredMap($this->request->getForm());
+    $personnumber = $fM->getInt("personnumber");
+
+    try {
+      $customer = $customerModel->getCustomer($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $customer];
+    return $this->render('editcustomer.twig', $properties);
+  }
+
+  public function deleteCustomer() {
+    $customerModel = new CustomerModel($this->db);
+
+    $fM =  new FilteredMap($this->request->getForm());
+    $personnumber = $fM->getInt("personnumber");
+
+    try {
+      $customer = $customerModel->getCustomer($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Customer not found.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $customerModel->deleteCustomer($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error deleteing customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $customer];
+    return $this->render('deletedcustomer.twig', $properties);
+  }
+
   public function getAllWithPage($page) {
     $page = (int)$page;
 
@@ -48,16 +89,38 @@ class CustomerController extends AbstractController {
     $newCustomer["name"] = $fM->getString("name");
     $newCustomer["address"] = $fM->getString("address");
     $newCustomer["postaladdress"] = $fM->getString("postaladdress");
-    $newCustomer["phonenumber"] = $fM->getInt("phonenumber");
+    $newCustomer["phonenumber"] = $fM->getString("phonenumber");
 
     try {
-      $customerModel->createCustomer($newCustomer);
+      $addedCustomer = $customerModel->createCustomer($newCustomer);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error creating customer.'];
       return $this->render('error.twig', $properties);
     }
 
-    $properties = ["customer" => $newCustomer];
+    $properties = ["customer" => $addedCustomer];
     return $this->render('addedcustomer.twig', $properties);
+  }
+
+  public function editedCustomer() {
+    $customerModel = new CustomerModel($this->db);
+
+    $fM =  new FilteredMap($this->request->getForm());
+    $newCustomer = [];
+    $newCustomer["personnumber"] = $fM->getInt("personnumber");
+    $newCustomer["name"] = $fM->getString("name");
+    $newCustomer["address"] = $fM->getString("address");
+    $newCustomer["postaladdress"] = $fM->getString("postaladdress");
+    $newCustomer["phonenumber"] = $fM->getString("phonenumber");
+
+    try {
+      $editedCustomer = $customerModel->editCustomer($newCustomer);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error editing customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $editedCustomer];
+    return $this->render('editedcustomer.twig', $properties);
   }
 }

@@ -23,19 +23,16 @@
     "controller": "Rental",
     "method": "getHistory"
   },
-  "editcustomer/:personnumber": {
+  "editcustomer": {
     "controller": "Customer",
-    "method": "edit",
+    "method": "editCustomer",
     "params": {
       "personnumber": "number"
     }
   },
-  "deletecustomer/:personnumber": {
+  "deletecustomer": {
     "controller": "Customer",
-    "method": "delete",
-    "params": {
-      "personnumber": "number"
-    }
+    "method": "deleteCustomer"
   },
   "addcustomer": {
     "controller": "Customer",
@@ -45,13 +42,9 @@
     "controller": "Customer",
     "method": "addedCustomer"
   },
-  "book/:id/borrow": {
-    "controller": "Book",
-    "method": "borrow",
-    "login": true,
-    "params": {
-      "id": "number"
-    }
+  "editedcustomer": {
+    "controller": "Customer",
+    "method": "editedCustomer"
   },
   "book/:id/return": {
     "controller": "Book",
