@@ -1,6 +1,7 @@
 :root {
   --main-bg-color: rgb(245, 245, 245);
   --dark-bg-color: darkslategrey;
+  --color: antiquewhite;
   --bso: 4px; /* box-shadow-offset */
   --bsl: rgba(255, 255, 255, 1); /* box-shadow-light color */
   --bsd: rgbs(0, 0, 0, 0.2); /* box-shadow-dark color */
@@ -20,8 +21,13 @@ body {
 }
 
 header h1 {
-  font-size: 1.5em;
   text-align: center;
+}
+
+header a {
+  font-size: 1.5em;
+  text-decoration: none;
+  color: var(--color);
 }
 
 nav {
@@ -33,6 +39,11 @@ nav {
 nav form {
   display: inline;
   margin-right: 1em;
+}
+
+main img {
+  margin-top: 1em;
+  width: 100%;
 }
 
 input[type='submit'] {
@@ -70,7 +81,7 @@ footer {
 
 .background-dark {
   background-color: var(--dark-bg-color);
-  color: antiquewhite;
+  color: var(--color);
   padding: 1em;
   width: 100%;
 }
