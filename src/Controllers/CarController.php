@@ -1,26 +1,26 @@
 <?php
 
-namespace Bookstore\Controllers;
+namespace Main\Controllers;
 
-use Bookstore\Exceptions\DbException;
-use Bookstore\Exceptions\NotFoundException;
-use Bookstore\Models\BookModel;
+use Main\Exceptions\DbException;
+use Main\Exceptions\NotFoundException;
+use Main\Models\CarModel;
 
-class BookController extends AbstractController {
+class CarController extends AbstractController {
     const PAGE_LENGTH = 10;
 
-    public function getAllWithPage($page): string {
+    public function getAllWithPage($page) {
         $page = (int)$page;
-        $bookModel = new BookModel($this->db);
+        $bookModel = new CarModel($this->db);
 
         $books = $bookModel->getAll($page, self::PAGE_LENGTH);
 
         $properties = [
-            'books' => $books,
+            'cars' => $books,
             'currentPage' => $page,
             'lastPage' => count($books) < self::PAGE_LENGTH
         ];
-        return $this->render('books.twig', $properties);
+        return $this->render('cars.twig', $properties);
     }
 
     public function getAll(): string {

@@ -35,13 +35,22 @@ nav form {
   margin-right: 1em;
 }
 
-nav form input,
-.btn-standard {
-  padding: 0.5em;
+input[type='submit'] {
   background-color: transparent;
   border-radius: 5px;
   box-shadow: var(--bso) var(--bso) var(--bso) 0 var(--bsd),
     -var(--bso) -var(--bso) -var(--bso) 0 var(--bsl);
+  padding: 0.5em;
+}
+
+input[type='submit']:hover {
+  background-color: rgb(154, 240, 154);
+  cursor: pointer;
+}
+
+input[type='submit']:hover:disabled {
+  background-color: transparent;
+  cursor: default;
 }
 
 main {

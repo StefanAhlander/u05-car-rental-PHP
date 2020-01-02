@@ -1,49 +1,41 @@
 <?php
 
-namespace Bookstore\Domain;
+namespace Main\Domain;
 
-class Book {
-    private $id;
-    private $isbn;
-    private $title;
-    private $author;
-    private $stock;
+class Car {
+    private $registration;
+    private $make;
+    private $color;
+    private $year;
     private $price;
+    private $checkedoutby;
+    private $checkedouttime;
 
-    public function getId(): int {
-        return $this->id;
+    public function getregistration() {
+        return $this->registration;
     }
 
-    public function getIsbn(): string {
-        return $this->isbn;
+    public function getMake() {
+        return $this->make;
     }
 
-    public function getTitle(): string {
-        return $this->title;
+    public function getColor() {
+        return $this->color;
     }
 
-    public function getAuthor(): string {
-        return $this->author;
+    public function getYear() {
+        return $this->year;
     }
 
-    public function getStock(): int {
-        return $this->stock;
-    }
-
-    public function getCopy(): bool {
-        if ($this->stock < 1) {
-            return false;
-        } else {
-            $this->stock--;
-            return true;
-        }
-    }
-
-    public function addCopy() {
-        $this->stock++;
-    }
-
-    public function getPrice(): float {
+    public function getPrice() {
         return $this->price;
+    }
+
+    public function getCheckedOutBy() {
+        return $this->checkedoutby;
+    }
+
+    public function getCheckedOutTime() {
+        return $this->checkedouttime;
     }
 }

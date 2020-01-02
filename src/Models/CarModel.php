@@ -1,14 +1,14 @@
 <?php
 
-namespace Bookstore\Models;
+namespace Main\Models;
 
-use Bookstore\Domain\Book;
-use Bookstore\Exceptions\DbException;
-use Bookstore\Exceptions\NotFoundException;
+use Main\Domain\Book;
+use Main\Exceptions\DbException;
+use Main\Exceptions\NotFoundException;
 use PDO;
 
-class BookModel extends AbstractModel {
-    const CLASSNAME = '\Bookstore\Domain\Book';
+class CarModel extends AbstractModel {
+    const CLASSNAME = '\Main\Domain\Car';
 
     public function get(int $bookId): Book {
         $query = 'SELECT * FROM book WHERE id = :id';
@@ -26,7 +26,7 @@ class BookModel extends AbstractModel {
     public function getAll(int $page, int $pageLength): array {
         $start = $pageLength * ($page - 1);
 
-        $query = 'SELECT * FROM book LIMIT :page, :length';
+        $query = 'SELECT * FROM cars LIMIT :page, :length';
         $sth = $this->db->prepare($query);
         $sth->bindParam('page', $start, PDO::PARAM_INT);
         $sth->bindParam('length', $pageLength, PDO::PARAM_INT);
