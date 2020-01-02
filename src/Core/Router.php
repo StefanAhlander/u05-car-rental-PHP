@@ -11,7 +11,8 @@
     private $routeMap;
     private static $regexPatters = [
         'number' => '\d+',
-        'string' => '\w'
+        'string' => '\w+',
+        'mixed' => '[a-zA-Z0-9]+'
     ];
 
     public function __construct($di) {

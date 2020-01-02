@@ -1,0 +1,41 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Deleted customer
+{% endblock %}
+
+{% block content %}
+  <h2>Customer deleted</h2>
+
+  <table>
+    <thead>
+      <th>Person Number</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Postal Address</th>
+      <th>Phonenumber</th>
+      <th></th>
+      <th></th>
+    </thead>
+
+    <tr>
+      <td>{{ customer.personnumber }}</td>
+      <td>{{ customer.name }}</td>
+      <td>{{ customer.address }}</td>
+      <td>{{ customer.postaladdress }}</td>
+      <td>{{ customer.phonenumber }}</td>
+      <td>
+      <form method="post" action="/addedcustomer">
+        <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
+        <input style="display: none" name="name" type="text" value="{{ customer.name }}" >
+        <input style="display: none" name="address" type="text" value="{{ customer.address }}" >
+        <input style="display: none" name="postaladdress" type="text" value="{{ customer.postaladdress }}" >
+        <input style="display: none" name="phonenumber" type="text" value="{{ customer.phonenumber }}" >
+        <input class="btn-standard" type="submit" value="Undo">
+      </form>
+    </td>
+    <td>
+    </td>
+    </tr>
+  </table>
+{% endblock %}

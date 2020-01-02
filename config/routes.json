@@ -46,12 +46,26 @@
     "controller": "Customer",
     "method": "editedCustomer"
   },
-  "book/:id/return": {
-    "controller": "Book",
-    "method": "returnBook",
-    "login": true,
+  "editcar/:registration": {
+    "controller": "Car",
+    "method": "editCar",
     "params": {
-      "id": "number"
+      "registration": "number"
+    }
+  },
+  "addcar": {
+    "controller": "Car",
+    "method": "add"
+  },
+  "addedcar": {
+    "controller": "Car",
+    "method": "addedCar"
+  },
+  "deletecar/:registration": {
+    "controller": "Car",
+    "method": "deleteCar",
+    "params": {
+      "registration": "mixed"
     }
   }
 }

@@ -18,7 +18,12 @@ class CustomerModel extends AbstractModel {
     $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
     $sth->execute();
 
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME)[0];
+    $customers = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
+    if (empty($customers)) {
+      throw new NotFoundException();
+    }
+
+    return $customers[0];
   }
 
   public function getAll($page, $pageLength) {

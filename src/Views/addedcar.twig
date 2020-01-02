@@ -1,11 +1,11 @@
 {% extends 'layout.twig' %}
 
 {% block title %}
-    Cars
+    Added car
 {% endblock %}
 
 {% block contentTitle %}
-  <h2>Cars</h2>
+  <h2>Car Added</h2>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,6 @@
       <th></th>
     </thead>
 
-{% for car in cars %}
     <tr>
       <td>{{ car.registration }}</td>
       <td>{{ car.make }}</td>
@@ -42,17 +41,5 @@
         </form>
       </td>
     </tr>
-{% endfor %}
-
-</table>
-{% if currentPage != 1 %}
-    <a href="/customers/{{ currentPage - 1 }}">Previous</a>
-{% endif %}
-{% if not lastPage %}
-    <a href="/customers/{{ currentPage + 1 }}">Next</a>
-{% endif %}
-
-  <form method="post" action="/addcar">
-    <input class="btn-standard" type="submit" value="Add car">
-  </form>
+  </table>
 {% endblock %}

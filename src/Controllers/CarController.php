@@ -5,70 +5,128 @@ namespace Main\Controllers;
 use Main\Exceptions\DbException;
 use Main\Exceptions\NotFoundException;
 use Main\Models\CarModel;
+use Main\Core\FilteredMap;
+
+use function PHPSTORM_META\registerArgumentsSet;
 
 class CarController extends AbstractController {
-    const PAGE_LENGTH = 10;
+  const PAGE_LENGTH = 10;
 
-    public function getAllWithPage($page) {
-        $page = (int)$page;
-        $bookModel = new CarModel($this->db);
+  public function getAllWithPage($page) {
+    $page = (int)$page;
+    $carModel = new CarModel($this->db);
 
-        $books = $bookModel->getAll($page, self::PAGE_LENGTH);
+    $cars = $carModel->getAll($page, self::PAGE_LENGTH);
 
-        $properties = [
-            'cars' => $books,
-            'currentPage' => $page,
-            'lastPage' => count($books) < self::PAGE_LENGTH
-        ];
-        return $this->render('cars.twig', $properties);
+    $properties = [
+      'cars' => $cars,
+      'currentPage' => $page,
+      'lastPage' => count($cars) < self::PAGE_LENGTH
+    ];
+    return $this->render('cars.twig', $properties);
+  }
+
+  public function getAll(): string {
+    return $this->getAllWithPage(1);
+  }
+
+  public function getCar($registration) {
+    $carModel = new CarModel($this->db);
+
+    try {
+      $car = $carModel->get($registration);
+    } catch (\Exception $e) {
+      $this->log->error('Error getting car: ' . $e->getMessage());
+      $properties = ['errorMessage' => 'Car not found!'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function getAll(): string {
-        return $this->getAllWithPage(1);
+    $properties = ['car' => $car];
+    return $this->render('car.twig', $properties);
+  }
+
+  public function editCar() {
+    $title = $this->request->getParams()->getString('title');
+    $author = $this->request->getParams()->getString('author');
+
+    $bookModel = new CarModel($this->db);
+    $books = $bookModel->search($title, $author);
+
+    $properties = [
+        'books' => $books,
+        'currentPage' => 1,
+        'lastPage' => true
+    ];
+    return $this->render('books.twig', $properties);
+  }
+
+
+  public function add() {
+    $carModel = new CarModel($this->db);
+    $makes = $carModel->getMakes();
+    $colors = $carModel->getColors();
+
+    $properties = ["makes" => $makes, "colors" => $colors];
+    return $this->render('addcar.twig', $properties);
+  }
+
+
+  public function addedCar() {
+    $carModel = new CarModel($this->db);
+    $newCar = $this->getCarFromForm();
+
+    try {
+      $addedCar = $carModel->addCar($newCar);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error adding car.'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function get(int $bookId): string {
-        $bookModel = new BookModel($this->db);
+    $properties = ["car" => $addedCar];
+    return $this->render('addedcar.twig', $properties);
+  }
 
-        try {
-            $book = $bookModel->get($bookId);
-        } catch (\Exception $e) {
-            $this->log->error('Error getting book: ' . $e->getMessage());
-            $properties = ['errorMessage' => 'Book not found!'];
-            return $this->render('error.twig', $properties);
-        }
+  public function deleteCar($registration) {
+    $carModel = new CarModel($this->db);
 
-        $properties = ['book' => $book];
-        return $this->render('book.twig', $properties);
+    try {
+      $car = $carModel->get($registration);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Car not found.'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function search(): string {
-        $title = $this->request->getParams()->getString('title');
-        $author = $this->request->getParams()->getString('author');
-
-        $bookModel = new BookModel($this->db);
-        $books = $bookModel->search($title, $author);
-
-        $properties = [
-            'books' => $books,
-            'currentPage' => 1,
-            'lastPage' => true
-        ];
-        return $this->render('books.twig', $properties);
+    try {
+      $carModel->deleteCar($registration);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error deleteing car.'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function getByUser(): string {
-        $bookModel = new BookModel($this->db);
+    $properties = ["car" => $car];
+    return $this->render('deletedcar.twig', $properties);
+  }
 
-        $books = $bookModel->getByUser($this->customerId);
 
-        $properties = [
-            'books' => $books,
-            'currentPage' => 1,
-            'lastPage' => true
-        ];
-        return $this->render('books.twig', $properties);
-    }
+
+
+  private function getCarFromForm() {
+    $fM =  new FilteredMap($this->request->getForm());
+    $car["registration"] = $fM->getString("registration");
+    $car["make"] = $fM->getString("make");
+    $car["color"] = $fM->getString("color");
+    $car["year"] = $fM->getInt("year");
+    $car["price"] = $fM->getInt("price");
+
+    return $car;
+  }
+
+
+
+
+
+
+
 
     public function borrow(int $bookId): string {
         $bookModel = new BookModel($this->db);

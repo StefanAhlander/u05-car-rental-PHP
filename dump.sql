@@ -17,7 +17,7 @@ CREATE TABLE cars(
   color VARCHAR(20) NOT NULL,
   year INT NOT NULL,
   price INT NOT NULL,
-  checkedoutby INT,
+  checkedoutby BIGINT,
   checkedouttime DATETIME
 ) ENGINE=InnoDb;
 
@@ -33,10 +33,45 @@ CREATE TABLE rentals(
   FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
-INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber) VALUES
+INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber, renting) VALUES
   (197302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", "0704979766", false),
   (198007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", "0725100580", false);
 
 INSERT INTO cars (registration, make, color, year, price) VALUES
   ("LSW364", "Toyota", "Gray", 2012, 500),
   ("DOL990", "Toyota", "Red", 2011, 200);
+
+CREATE TABLE makes(
+  make VARCHAR(100) NOT NULL
+) ENGINE=InnoDb;
+
+CREATE TABLE colors(
+  color VARCHAR(100) NOT NULL
+) ENGINE=InnoDb;
+
+INSERT INTO makes (make) VALUES
+  ("Peugeot"),
+  ("Suzuki"),
+  ("Fiat"),
+  ("Honda"),
+  ("Ford"),
+  ("Hyundai"),
+  ("Renault"),
+  ("Toyota"),
+  ("Volkswagen"),
+  ("Chrystler"),
+  ("Volvo"),
+  ("Audi"),
+  ("BMW"),
+  ("Mercedes");
+
+  INSERT INTO colors (color) VALUES
+    ("Blue"),
+    ("Red"),
+    ("Green"),
+    ("Yellow"),
+    ("Black"),
+    ("White"),
+    ("Magenta"),
+    ("Gray"),
+    ("Brown");

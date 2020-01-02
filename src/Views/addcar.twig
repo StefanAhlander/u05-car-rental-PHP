@@ -1,0 +1,58 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Add customer
+{% endblock %}
+
+{% block content %}
+<h2>Add car</h2>
+
+<form class="enterform" method="post" action="/addedcar">
+  <ul>
+    <li>
+      <label for="registration">Registration number:</label>
+      <input type="text" name="registration">
+      <span>Add a valid registration number, 6 figures.</span>
+    </li>
+    
+    <li>
+      <label for="make">Make:</label>
+      <select name="make">
+        <option value="">-- Please select a make --</option>
+
+{% for make in makes %}
+        <option value="{{ make }}">{{ make }}</option>
+{% endfor %}
+
+      </select>
+    </li>
+    
+    <li>
+      <label for="color">Color:</label>
+      <select name="color">
+        <option value="">-- Please select a color --</option>
+
+{% for color in colors %}
+        <option value="{{ color }}">{{ color }}</option>
+{% endfor %}
+
+      </select>    </li>
+    
+    <li>
+      <label for="year">Year:</label>
+      <input type="text" name="year">
+       <span>Add model year.</span>
+   </li>
+  
+    <li>
+      <label for="price">Price:</label>
+      <input type="text" name="price">
+      <span>Add daily rent.</span>
+    </li>
+
+    <li>
+      <input type="submit" value="Save car" >
+    </li>
+  </ul>
+</form>
+{% endblock %}
