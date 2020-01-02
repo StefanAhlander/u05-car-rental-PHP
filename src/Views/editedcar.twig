@@ -1,0 +1,45 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Edited car
+{% endblock %}
+
+{% block contentTitle %}
+  <h2>Car edited</h2>
+{% endblock %}
+
+{% block content %}
+  <table>
+    <thead>
+      <th>Registration</th>
+      <th>Make</th>
+      <th>Color</th>
+      <th>Year</th>
+      <th>Price</th>
+      <th>Checked out by</th>
+      <th>Checked out time</th>
+      <th></th>
+      <th></th>
+    </thead>
+
+    <tr>
+      <td>{{ car.registration }}</td>
+      <td>{{ car.make }}</td>
+      <td>{{ car.color }}</td>
+      <td>{{ car.year }}</td>
+      <td>{{ car.price }}</td>
+      <td>{{ car.checkedoutby }}</td>
+      <td>{{ car.checkedouttime }}</td>
+      <td>
+        <form method="post" action="/editcar/{{ car.registration }}">
+          <input class="btn-standard" type="submit" value="Edit" {% if car.checkedoutby == true %}disabled{% endif %}>
+        </form>
+      </td>
+      <td>
+        <form method="post" action="/deletecar/{{ car.registration }}">
+          <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this car?')" {% if car.checkedoutby == true %}disabled{% endif %}>
+        </form>
+      </td>
+    </tr>
+  </table>
+{% endblock %}

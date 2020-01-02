@@ -7,8 +7,6 @@ use Main\Exceptions\NotFoundException;
 use Main\Models\CarModel;
 use Main\Core\FilteredMap;
 
-use function PHPSTORM_META\registerArgumentsSet;
-
 class CarController extends AbstractController {
   const PAGE_LENGTH = 10;
 
@@ -30,35 +28,37 @@ class CarController extends AbstractController {
     return $this->getAllWithPage(1);
   }
 
-  public function getCar($registration) {
+  public function editCar($registration) {
     $carModel = new CarModel($this->db);
+    $makes = $carModel->getMakes();
+    $colors = $carModel->getColors();
 
     try {
       $car = $carModel->get($registration);
     } catch (\Exception $e) {
-      $this->log->error('Error getting car: ' . $e->getMessage());
-      $properties = ['errorMessage' => 'Car not found!'];
+      $properties = ['errorMessage' => 'Error getting car.'];
       return $this->render('error.twig', $properties);
     }
 
-    $properties = ['car' => $car];
-    return $this->render('car.twig', $properties);
+    $properties = ["car" => $car, "makes" => $makes, "colors" => $colors];
+    return $this->render('editcar.twig', $properties);
   }
 
-  public function editCar() {
-    $title = $this->request->getParams()->getString('title');
-    $author = $this->request->getParams()->getString('author');
+  public function editedCar() {
+    $carModel = new CarModel($this->db);
+    $car = $this->getCarFromForm();
 
-    $bookModel = new CarModel($this->db);
-    $books = $bookModel->search($title, $author);
+    try {
+      $editedCar = $carModel->editCar($car);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error editing car.'];
+      return $this->render('error.twig', $properties);
+    }
 
-    $properties = [
-        'books' => $books,
-        'currentPage' => 1,
-        'lastPage' => true
-    ];
-    return $this->render('books.twig', $properties);
+    $properties = ["car" => $editedCar];
+    return $this->render('editedcar.twig', $properties);
   }
+
 
 
   public function add() {

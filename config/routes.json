@@ -50,7 +50,7 @@
     "controller": "Car",
     "method": "editCar",
     "params": {
-      "registration": "number"
+      "registration": "mixed"
     }
   },
   "addcar": {
@@ -67,5 +67,9 @@
     "params": {
       "registration": "mixed"
     }
+  },
+  "editedcar": {
+    "controller": "Car",
+    "method": "editedCar"
   }
 }

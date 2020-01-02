@@ -60,7 +60,23 @@ SQL;
     $sth->execute();
   }
 
+  public function editCar($car) {
+    $query = <<<SQL
+UPDATE cars
+SET make=:make, color=:color, year=:year, price=:price
+WHERE registration=:registration
+SQL;
 
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("registration", $car["registration"], PDO::PARAM_STR);
+    $sth->bindParam("make", $car["make"], PDO::PARAM_STR);
+    $sth->bindParam("color", $car["color"], PDO::PARAM_STR);
+    $sth->bindParam("year", $car["year"], PDO::PARAM_INT);
+    $sth->bindParam("price", $car["price"], PDO::PARAM_INT);
+    $sth->execute();
+
+    return $this->get($car["registration"]);
+  }
 
   public function getMakes() {
     $query = 'SELECT * FROM makes';
