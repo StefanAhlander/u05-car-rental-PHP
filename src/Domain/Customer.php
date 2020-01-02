@@ -8,6 +8,7 @@ class Customer {
     private $address;
     private $postaladdress;
     private $phonenumber;
+    private $renting;
 
     public function getPersonNumber() {
         return $this->personnumber;
@@ -27,5 +28,17 @@ class Customer {
 
     public function getPhoneNumber() {
         return $this->phonenumber;
+    }
+
+    public function getRenting() {
+        return $this->renting;
+    }
+
+    public function setRenting() {
+        $this->renting = true;
+    }
+
+    public function resetRenting() {
+        $this->renting = false;
     }
 }

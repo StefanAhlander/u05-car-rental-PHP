@@ -1,7 +1,7 @@
 {
   "": {
     "controller": "Customer",
-    "method": "startPage"
+    "method": "getAll"
   },
   "customers": {
     "controller": "Customer",

@@ -6,18 +6,11 @@ use Main\Exceptions\NotFoundException;
 use Main\Models\CustomerModel;
 use Main\Core\FilteredMap;
 
-
 class CustomerController extends AbstractController {
   const PAGE_LENGTH = 10;
 
-  public function startPage() {
-    $properties = [];
-    return $this->render('main.twig', $properties);
-  }
-
   public function editCustomer() {
     $customerModel = new CustomerModel($this->db);
-
     $fM =  new FilteredMap($this->request->getForm());
     $personnumber = $fM->getInt("personnumber");
 
@@ -34,7 +27,6 @@ class CustomerController extends AbstractController {
 
   public function deleteCustomer() {
     $customerModel = new CustomerModel($this->db);
-
     $fM =  new FilteredMap($this->request->getForm());
     $personnumber = $fM->getInt("personnumber");
 
@@ -58,9 +50,7 @@ class CustomerController extends AbstractController {
 
   public function getAllWithPage($page) {
     $page = (int)$page;
-
     $customerModel = new CustomerModel($this->db);
-
     $customers = $customerModel->getAll($page, self::PAGE_LENGTH);
 
     $properties = [
@@ -82,14 +72,7 @@ class CustomerController extends AbstractController {
 
   public function addedCustomer() {
     $customerModel = new CustomerModel($this->db);
-
-    $fM =  new FilteredMap($this->request->getForm());
-    $newCustomer = [];
-    $newCustomer["personnumber"] = $fM->getInt("personnumber");
-    $newCustomer["name"] = $fM->getString("name");
-    $newCustomer["address"] = $fM->getString("address");
-    $newCustomer["postaladdress"] = $fM->getString("postaladdress");
-    $newCustomer["phonenumber"] = $fM->getString("phonenumber");
+    $newCustomer = $this->getCustomerFromForm();
 
     try {
       $addedCustomer = $customerModel->createCustomer($newCustomer);
@@ -104,14 +87,7 @@ class CustomerController extends AbstractController {
 
   public function editedCustomer() {
     $customerModel = new CustomerModel($this->db);
-
-    $fM =  new FilteredMap($this->request->getForm());
-    $newCustomer = [];
-    $newCustomer["personnumber"] = $fM->getInt("personnumber");
-    $newCustomer["name"] = $fM->getString("name");
-    $newCustomer["address"] = $fM->getString("address");
-    $newCustomer["postaladdress"] = $fM->getString("postaladdress");
-    $newCustomer["phonenumber"] = $fM->getString("phonenumber");
+    $newCustomer = $this->getCustomerFromForm();
 
     try {
       $editedCustomer = $customerModel->editCustomer($newCustomer);
@@ -122,5 +98,16 @@ class CustomerController extends AbstractController {
 
     $properties = ["customer" => $editedCustomer];
     return $this->render('editedcustomer.twig', $properties);
+  }
+
+  private function getCustomerFromForm() {
+    $fM =  new FilteredMap($this->request->getForm());
+    $customer["personnumber"] = $fM->getInt("personnumber");
+    $customer["name"] = $fM->getString("name");
+    $customer["address"] = $fM->getString("address");
+    $customer["postaladdress"] = $fM->getString("postaladdress");
+    $customer["phonenumber"] = $fM->getString("phonenumber");
+
+    return $customer;
   }
 }

@@ -1,23 +1,15 @@
-{% extends 'layout.twig' %}
+{% extends 'customers-layout.twig' %}
 
 {% block title %}
     Edited customer
 {% endblock %}
 
-{% block content %}
+
+{% block contentTitle %}
   <h2>Customer Edited</h2>
+{% endblock %}
 
-  <table>
-    <thead>
-      <th>Person Number</th>
-      <th>Name</th>
-      <th>Address</th>
-      <th>Postal Address</th>
-      <th>Phonenumber</th>
-      <th></th>
-      <th></th>
-    </thead>
-
+{% block innerContent %}
     <tr>
       <td>{{ customer.personnumber }}</td>
       <td>{{ customer.name }}</td>
@@ -27,13 +19,13 @@
       <td>
       <form method="post" action="/editcustomer">
         <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-        <input class="btn-standard" type="submit" value="Edit">
+        <input class="btn-standard" type="submit" value="Edit" {% if customer.renting == true %}disabled{% endif %}>
       </form>
     </td>
       <td>
         <form method="post" action="/deletecustomer" >
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-          <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')">
+          <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')" {% if customer.renting == true %}disabled{% endif %}>
         </form>
       </td>
     </tr>
