@@ -1,0 +1,27 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Checkin
+{% endblock %}
+
+{% block contentTitle %}
+  <h2>Checkin Car</h2>
+{% endblock %}
+
+{% block content %}
+<form class="enterform" method="post" action="/checkedin">
+  <ul>
+    <li>
+      <label for="registration">Car:</label>
+      <select name="registration">
+{% for car in cars %}
+        <option value="{{ car.registration }}">{{ car.registration }} {{ car.make }} {{ car.color }}</option>
+{% endfor %}
+      </select>    </li>
+
+    <li>
+      <input type="submit" value="Check In" >
+    </li>
+  </ul>
+</form>
+{% endblock %}

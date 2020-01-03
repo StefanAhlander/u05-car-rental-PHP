@@ -18,7 +18,8 @@ CREATE TABLE cars(
   year INT NOT NULL,
   price INT NOT NULL,
   checkedoutby BIGINT,
-  checkedouttime DATETIME
+  checkedouttime DATETIME,
+  FOREIGN KEY (checkedoutby) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
 CREATE TABLE rentals(
@@ -26,11 +27,11 @@ CREATE TABLE rentals(
   registration CHAR(6) NOT NULL,
   personnumber BIGINT NOT NULL,
   checkouttime DATETIME NOT NULL,
-  checkintime DATETIME NOT NULL,
-  days INT NOT NULL,
-  cost INT NOT NULL,
-  FOREIGN KEY (registration) REFERENCES cars(registration),
-  FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
+  checkintime DATETIME,
+  days INT,
+  cost FLOAT,
+  FOREIGN KEY (registration) REFERENCES cars(registration) ON DELETE CASCADE,
+  FOREIGN KEY (personnumber) REFERENCES customers(personnumber) ON DELETE CASCADE
 ) ENGINE=InnoDb;
 
 INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber, renting) VALUES

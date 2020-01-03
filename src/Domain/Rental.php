@@ -1,41 +1,41 @@
 <?php
 
-namespace Bookstore\Domain;
+namespace Main\Domain;
 
-class Sale {
+class Rental {
     private $id;
-    private $customer_id;
-    private $books;
-    private $date;
+    private $registration;
+    private $personnumber;
+    private $checkouttime;
+    private $checkintime;
+    private $days;
+    private $cost;
 
-    public function setCustomerId(int $customerId) {
-        $this->customer_id = $customerId;
-    }
-
-    public function getId(): int {
+    public function getId() {
         return $this->id;
     }
 
-    public function getCustomerId(): int {
-        return $this->customer_id;
+    public function getRegistration() {
+        return $this->registration;
     }
 
-    public function getBooks(): array {
-        return $this->books;
+    public function getPersonNumber() {
+        return $this->personnumber;
     }
 
-    public function getDate(): string {
-        return $this->date;
+    public function getCheckOutTime() {
+        return $this->checkouttime;
     }
 
-    public function addBook(int $bookId, int $amount = 1) {
-        if (!isset($this->books[$bookId])) {
-            $this->books[$bookId] = 0;
-        }
-        $this->books[$bookId] += $amount;
+    public function getCheckInTime() {
+        return $this->checkintime;
     }
 
-    public function setBooks(array $books) {
-        $this->books = $books;
+    public function getDays() {
+        return $this->days;
+    }
+
+    public function getCost() {
+        return $this->cost;
     }
 }

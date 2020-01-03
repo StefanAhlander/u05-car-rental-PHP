@@ -8,24 +8,16 @@ use Main\Models\CarModel;
 use Main\Core\FilteredMap;
 
 class CarController extends AbstractController {
-  const PAGE_LENGTH = 10;
 
-  public function getAllWithPage($page) {
-    $page = (int)$page;
+  public function getAll() {
     $carModel = new CarModel($this->db);
 
-    $cars = $carModel->getAll($page, self::PAGE_LENGTH);
+    $cars = $carModel->getAll();
 
     $properties = [
-      'cars' => $cars,
-      'currentPage' => $page,
-      'lastPage' => count($cars) < self::PAGE_LENGTH
+      'cars' => $cars
     ];
     return $this->render('cars.twig', $properties);
-  }
-
-  public function getAll(): string {
-    return $this->getAllWithPage(1);
   }
 
   public function editCar($registration) {

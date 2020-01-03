@@ -1,78 +1,169 @@
 <?php
 
-namespace Bookstore\Models;
+namespace Main\Models;
 
-use Bookstore\Domain\Sale;
-use Bookstore\Exceptions\DbException;
-use Bookstore\Exceptions\NotFoundException;
+use Main\Domain\Rental;
+use Main\Domain\Car;
+use Main\Exceptions\DbException;
+use Main\Exceptions\NotFoundException;
 use PDO;
+use DateTime;
+use DateTimeZone;
 
-class SaleModel extends AbstractModel {
-    const CLASSNAME = '\Bookstore\Domain\Sale';
+class RentalModel extends AbstractModel {
+  const CLASSNAME_RENTAL = '\Main\Domain\Rental';
+  const CLASSNAME_CAR = '\Main\Domain\Car';
 
-    public function getByUser(int $userId): array {
-        $query = 'SELECT * FROM sale WHERE customer_id = :user';
-        $sth = $this->db->prepare($query);
-        $sth->execute(['user' => $userId]);
+  public function get($id) {
+    $query = "SELECT * FROM rentals WHERE id = :id";
 
-        return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
-    }
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("id", $id, PDO::PARAM_INT);
+    $sth->execute();
 
-    public function get(int $saleId): Sale {
-        $query = 'SELECT * FROM sale WHERE id = :id';
-        $sth = $this->db->prepare($query);
-        $sth->execute(['id' => $saleId]);
-        $sales = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
+    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL)[0];
+  }
 
-        if (empty($sales)) {
-            throw new NotFoundException('Sale not found.');
-        }
-        $sale = array_pop($sales);
+  public function getAll() {
+    $query = "SELECT * FROM rentals";
 
-        $query = <<<SQL
-SELECT b.id, b.title, b.author, b.price, sb.amount as stock, b.isbn
-FROM sale s
-LEFT JOIN sale_book sb ON s.id = sb.sale_id
-LEFT JOIN book b ON sb.book_id = b.id
-WHERE s.id = :id
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
+  }
+
+  public function createRental($personnumber, $registration) {
+    $this->db->beginTransaction();
+
+    $query = <<<SQL
+UPDATE customers SET renting = true 
+WHERE personnumber = :personnumber
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->execute(['id' => $saleId]);
-        $books = $sth->fetchAll(PDO::FETCH_CLASS, BookModel::CLASSNAME);
 
-        $sale->setBooks($books);
-        return $sale;
-    }
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
+    $sth->execute();
 
-    public function create(Sale $sale) {
-        $this->db->beginTransaction();
-
-        $query = <<<SQL
-INSERT INTO sale(customer_id, date)
-VALUES(:id, NOW())
+    $query = <<<SQL
+UPDATE cars SET checkedoutby = :personnumber,
+  checkedouttime = CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm")
+WHERE registration = :registration
 SQL;
-        $sth = $this->db->prepare($query);
-        if (!$sth->execute(['id' => $sale->getCustomerId()])) {
-            $this->db->rollBack();
-            throw new DbException($sth->errorInfo()[2]);
-        }
 
-        $saleId = $this->db->lastInsertId();
-        $query = <<<SQL
-INSERT INTO sale_book(sale_id, book_id, amount)
-VALUES(:sale, :book, :amount)
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
+    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
+    $sth->execute();
+
+    $query = <<<SQL
+INSERT INTO rentals (registration, personnumber, checkouttime, checkintime, days, cost)
+VALUES (:registration, :personnumber, CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm"), null, null, null)
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->bindValue('sale', $saleId);
-        foreach ($sale->getBooks() as $bookId => $amount) {
-            $sth->bindValue('book', $bookId);
-            $sth->bindValue('amount', $amount);
-            if (!$sth->execute()) {
-                $this->db->rollBack();
-                throw new DbException($sth->errorInfo()[2]);
-            }
-        }
 
-        $this->db->commit();
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
+    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
+    $sth->execute();
+
+    $id = $this->db->lastInsertId();
+
+    $this->db->commit();
+
+    return $id;
+  }
+
+  public function closeRental($registration) {
+    $this->db->beginTransaction();
+
+    $query = <<<SQL
+SELECT * FROM rentals 
+WHERE registration = :registration
+AND checkintime IS NULL
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("registration", $registration, PDO::PARAM_INT);
+    $sth->execute();
+
+    $result = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL)[0];
+
+    $id = $result->getID();
+    $registration = $result->getRegistration();
+    $personnumber = $result->getPersonNumber();
+
+    $sth = $this->db->prepare("SET @id = :id; SET @registration = :registration; SET @personnumber = :personnumber; ");
+    $sth->bindParam(':id', $id, PDO::PARAM_INT);
+    $sth->bindParam(':registration', $registration, PDO::PARAM_STR);
+    $sth->bindParam(':personnumber', $personnumber, PDO::PARAM_INT);
+    $sth->execute();
+
+    $query = <<<SQL
+UPDATE customers SET renting = false 
+WHERE personnumber = @personnumber
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    $query = <<<SQL
+UPDATE cars SET checkedoutby = NULL,
+  checkedouttime = NULL
+WHERE registration = @registration
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    $query = "SELECT * FROM cars WHERE registration = @registration";
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    $car = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_CAR)[0];
+    $price = $car->getPrice();
+
+    $query = <<<SQL
+UPDATE rentals 
+SET checkintime = CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm")
+WHERE id = @id
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    $query = <<<SQL
+SELECT TIMESTAMPDIFF(SECOND, 
+  (SELECT checkouttime FROM rentals WHERE id = @id), 
+  (SELECT checkintime FROM rentals WHERE id = @id))
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->execute();
+
+    $diff = $sth->fetch()[0];
+    echo $diff;
+
+    if($diff <= 86400) {
+      $days = 1;
+    } else {
+      $days = intval($diff / 86400) + 1;
     }
+    
+    $cost = strval($days * $price);
+
+    $query = <<<SQL
+UPDATE rentals 
+SET days = :days, cost = :cost
+WHERE id = @id
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("days", $days, PDO::PARAM_INT);
+    $sth->bindParam("cost", $cost, PDO::PARAM_STR);
+    $sth->execute();
+
+    $this->db->commit();
+
+    return $id;  
+  }
 }

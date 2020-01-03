@@ -1,45 +1,80 @@
 <?php
 
-namespace Bookstore\Controllers;
+namespace Main\Controllers;
 
-use Bookstore\Domain\Sale;
-use Bookstore\Models\SaleModel;
+use Main\Domain\Rental;
+use Main\Models\RentalModel;
+use Main\Models\CarModel;
+use Main\Models\CustomerModel;
+use Main\Core\FilteredMap;
 
-class SalesController extends AbstractController {
-    public function add($id): string {
-        $bookId = (int)$id;
-        $salesModel = new SaleModel($this->db);
+class RentalController extends AbstractController {
+  public function checkOutCar() {
+    $carModel = new CarModel($this->db);
+    $customerModel = new CustomerModel($this->db);
 
-        $sale = new Sale();
-        $sale->setCustomerId($this->customerId);
-        $sale->addBook($bookId);
+    $cars = $carModel->getAllNotRented();
+    $customers = $customerModel->getAll();
 
-        try {
-            $salesModel->create($sale);
-        } catch (\Exception $e) {
-            $properties = ['errorMessage' => 'Error buying the book.'];
-            $this->log->error('Error buying book: ' . $e->getMessage());
-            return $this->render('error.twig', $properties);
-        }
+    $properties = ["cars" => $cars, "customers" => $customers];
+    return $this->render('checkout.twig', $properties);
+  }
 
-        return $this->getByUser();
+  public function checkedOutCar() {
+    $rentalModel = new RentalModel($this->db);
+
+    $fM =  new FilteredMap($this->request->getForm());
+    $personnumber = $fM->getInt("personnumber");
+    $registration = $fM->getString("registration");
+
+    try {
+      $id = $rentalModel->createRental($personnumber, $registration);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error creating rental.'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function getByUser(): string {
-        $salesModel = new SaleModel($this->db);
+    $rental = $rentalModel->get($id);
 
-        $sales = $salesModel->getByUser($this->customerId);
+    $properties = ["rental" => $rental];
+    return $this->render('checkedout.twig', $properties);
+  }
 
-        $properties = ['sales' => $sales];
-        return $this->render('sales.twig', $properties);
+  public function checkInCar() {
+    $carModel = new CarModel($this->db);
+
+    $cars = $carModel->getAllRented();
+
+    $properties = ["cars" => $cars];
+    return $this->render('checkin.twig', $properties);
+  }
+
+  public function checkedInCar() {
+    $rentalModel = new RentalModel($this->db);
+
+    $fM =  new FilteredMap($this->request->getForm());
+    $registration = $fM->getString("registration");
+
+    try {
+      $id = $rentalModel->closeRental($registration);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error closing rental.'];
+      return $this->render('error.twig', $properties);
     }
 
-    public function get($saleId): string {
-        $salesModel = new SaleModel($this->db);
+    $rental = $rentalModel->get($id);
 
-        $sale = $salesModel->get($saleId);
+    $properties = ["rental" => $rental];
+    return $this->render('checkedin.twig', $properties);
+  }
 
-        $properties = ['sale' => $sale];
-        return $this->render('sale.twig', $properties);
-    }
+  public function getHistory() {
+    $rentalModel = new RentalModel($this->db);
+
+    $rentals = $rentalModel->getAll();
+
+    $properties = ["rentals" => $rentals];
+    return $this->render('history.twig', $properties);
+  }
+
 }

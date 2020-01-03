@@ -1,0 +1,36 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Checkout
+{% endblock %}
+
+{% block contentTitle %}
+  <h2>Checkout Car</h2>
+{% endblock %}
+
+{% block content %}
+<form class="enterform" method="post" action="/checkedout">
+  <ul>
+    <li>
+      <label for="personnumber">Customer:</label>
+      <select name="personnumber">
+{% for customer in customers %}
+        <option value="{{ customer.personnumber }}">{{ customer.personnumber }} {{ customer.name }}</option>
+{% endfor %}
+      </select>
+    </li>
+    
+    <li>
+      <label for="registration">Car:</label>
+      <select name="registration">
+{% for car in cars %}
+        <option value="{{ car.registration }}">{{ car.registration }} {{ car.make }} {{ car.color }}</option>
+{% endfor %}
+      </select>    </li>
+
+    <li>
+      <input type="submit" value="Check Out" >
+    </li>
+  </ul>
+</form>
+{% endblock %}

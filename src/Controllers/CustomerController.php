@@ -7,7 +7,6 @@ use Main\Models\CustomerModel;
 use Main\Core\FilteredMap;
 
 class CustomerController extends AbstractController {
-  const PAGE_LENGTH = 10;
 
   public function editCustomer() {
     $customerModel = new CustomerModel($this->db);
@@ -48,21 +47,14 @@ class CustomerController extends AbstractController {
     return $this->render('deletedcustomer.twig', $properties);
   }
 
-  public function getAllWithPage($page) {
-    $page = (int)$page;
+  public function getAll() {
     $customerModel = new CustomerModel($this->db);
-    $customers = $customerModel->getAll($page, self::PAGE_LENGTH);
+    $customers = $customerModel->getAll();
 
     $properties = [
-        'customers' => $customers,
-        'currentPage' => $page,
-        'lastPage' => count($customers) < self::PAGE_LENGTH
+        'customers' => $customers
     ];
     return $this->render('customers.twig', $properties);
-  }
-
-  public function getAll() {
-    return $this->getAllWithPage(1);
   }
 
   public function add() {

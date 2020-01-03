@@ -26,13 +26,9 @@ class CustomerModel extends AbstractModel {
     return $customers[0];
   }
 
-  public function getAll($page, $pageLength) {
-    $start = $pageLength * ($page - 1);
-
-    $query = "SELECT * FROM customers LIMIT :page, :length";
+  public function getAll() {
+    $query = "SELECT * FROM customers ORDER BY name";
     $sth = $this->db->prepare($query);
-    $sth->bindParam("page", $start, PDO::PARAM_INT);
-    $sth->bindParam("length", $pageLength, PDO::PARAM_INT);
     $sth->execute();
 
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);

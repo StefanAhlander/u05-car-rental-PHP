@@ -1,0 +1,33 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    Rental history
+{% endblock %}
+
+{% block contentTitle %}
+  <h2>Rental history</h2>
+{% endblock %}
+
+{% block content %}
+  <table>
+    <thead>
+      <th>Registration</th>
+      <th>Person number</th>
+      <th>Check out time</th>
+      <th>Check in time</th>
+      <th>Days</th>
+      <th>Cost</th>
+    </thead>
+
+{% for rental in rentals %}
+    <tr>
+      <td>{{ rental.registration }}</td>
+      <td>{{ rental.personnumber }}</td>
+      <td>{{ rental.checkouttime }}</td>
+      <td>{{ rental.checkintime }}</td>
+      <td>{{ rental.days }}</td>
+      <td>{{ rental.cost }}</td>
+    </tr>
+{% endfor %}
+  </table>
+{% endblock %}
