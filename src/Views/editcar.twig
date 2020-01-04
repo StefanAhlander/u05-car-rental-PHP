@@ -7,7 +7,7 @@
 {% block content %}
 <h2>Edit car</h2>
 
-<form class="enterform" method="post" action="/editedcar">
+<form id="validate" class="enterform" method="post" action="/editedcar">
   <ul>
     <li>
       <label for="registration">Registration number:</label>
@@ -44,13 +44,13 @@
     
     <li>
       <label for="year">Year:</label>
-      <input type="text" name="year" value="{{ car.year }}">
+      <input type="text" name="year" value="{{ car.year }}" data-validate="year">
        <span>Add model year.</span>
    </li>
   
     <li>
       <label for="price">Price:</label>
-      <input type="text" name="price" value="{{ car.price }}">
+      <input type="text" name="price" value="{{ car.price }}" data-validate="price">
       <span>Add daily rent.</span>
     </li>
 

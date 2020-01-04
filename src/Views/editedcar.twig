@@ -28,7 +28,14 @@
       <td>{{ car.color }}</td>
       <td>{{ car.year }}</td>
       <td>{{ car.price }}</td>
-      <td>{{ car.checkedoutby }}</td>
+      <td>
+      {% if car.checkedoutby is null %}
+        free
+      {% endif %}
+      {% if car.checkedoutby is not null %}
+        {{ car.checkedoutby }}</td>
+      {% endif %}
+      </td>
       <td>{{ car.checkedouttime }}</td>
       <td>
         <form method="post" action="/editcar/{{ car.registration }}">
