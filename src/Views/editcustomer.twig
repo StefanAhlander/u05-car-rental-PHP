@@ -7,7 +7,7 @@
 {% block content %}
 <h2>Edit customer</h2>
 
-<form class="enterform" method="post" action="/editedcustomer">
+<form id="validate" class="enterform" method="post" action="/editedcustomer">
   <ul>
     <li>
       <label for="personnumberplaceholder">Person number:</label>
@@ -36,7 +36,7 @@
   
     <li>
       <label for="phonenumber">Phonenumber:</label>
-      <input type="text" name="phonenumber" value="{{ customer.phonenumber }}">
+      <input type="text" name="phonenumber" value="{{ customer.phonenumber }}" data-validate="phonenumber">
       <span>Add phonenumber.</span>
     </li>
 

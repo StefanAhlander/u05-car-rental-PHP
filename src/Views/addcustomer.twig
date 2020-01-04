@@ -7,11 +7,11 @@
 {% block content %}
 <h2>Add customer</h2>
 
-<form class="enterform" method="post" action="/addedcustomer">
+<form id="validate" class="enterform" method="post" action="/addedcustomer">
   <ul>
     <li>
       <label for="personnumber">Person number:</label>
-      <input type="text" name="personnumber">
+      <input type="text" name="personnumber" data-validate="personnumber">
       <span>Add a valid personal number, 12 figures.</span>
     </li>
     
@@ -35,12 +35,12 @@
   
     <li>
       <label for="phonenumber">Phonenumber:</label>
-      <input type="text" name="phonenumber">
+      <input type="text" name="phonenumber" data-validate="phonenumber">
       <span>Add phonenumber.</span>
     </li>
 
     <li>
-      <input type="submit" value="Save customer" >
+      <input type="submit" value="Save customer">
     </li>
   </ul>
 </form>
