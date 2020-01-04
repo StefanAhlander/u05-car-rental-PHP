@@ -3,6 +3,16 @@ const elementIdSet = [
     id: 'validate',
     event: 'submit',
     handler: validate
+  },
+  {
+    id: 'selectMake',
+    event: 'change',
+    handler: removeChild
+  },
+  {
+    id: 'selectColor',
+    event: 'change',
+    handler: removeChild
   }
 ];
 
@@ -94,6 +104,10 @@ function validate(e) {
     alert('Your form contains errors!\n' + message);
     return false;
   }
+}
+
+function removeChild(elt) {
+  document.querySelector('.remove').remove();
 }
 
 elementIdSet.forEach(item => {

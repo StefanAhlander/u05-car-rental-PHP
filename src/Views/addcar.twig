@@ -17,8 +17,8 @@
     
     <li>
       <label for="make">Make:</label>
-      <select name="make">
-        <option value="">-- Please select a make --</option>
+      <select id="selectMake" name="make">
+        <option class="remove" value="">-- Please select a make --</option>
 
 {% for make in makes %}
         <option value="{{ make }}">{{ make }}</option>
@@ -29,8 +29,8 @@
     
     <li>
       <label for="color">Color:</label>
-      <select name="color">
-        <option value="">-- Please select a color --</option>
+      <select id="selectColor" name="color">
+        <option class="remove" value="">-- Please select a color --</option>
 
 {% for color in colors %}
         <option value="{{ color }}">{{ color }}</option>
