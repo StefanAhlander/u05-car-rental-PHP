@@ -18,19 +18,19 @@
       <td>
         <form method="post" action="/editcustomer">
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-          <input class="btn-standard" type="submit" value="Edit" {% if customer.renting == true %}disabled{% endif %}>
+          <input type="submit" value="Edit" {% if customer.renting == true %}disabled{% endif %}>
         </form>
       </td>
       <td>
-        <form method="post" action="/deletecustomer">
+        <form class="delete" method="post" action="/deletecustomer">
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-          <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')" {% if customer.renting == true %}disabled{% endif %}>
+          <input type="submit" value="Delete" {% if customer.renting == true %}disabled{% endif %}>
         </form>
       </td>
     </tr>
   </table>
   
   <form method="post" action="/addcustomer">
-    <input class="btn-standard" type="submit" value="Add another customer">
+    <input type="submit" value="Add another customer">
   </form>
 {% endblock %}

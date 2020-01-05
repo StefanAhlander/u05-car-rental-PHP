@@ -1,18 +1,23 @@
 const elementIdSet = [
   {
-    id: 'validate',
+    id: '#validate',
     event: 'submit',
     handler: validate
   },
   {
-    id: 'selectMake',
+    id: '#selectMake',
     event: 'change',
     handler: removeChild
   },
   {
-    id: 'selectColor',
+    id: '#selectColor',
     event: 'change',
     handler: removeChild
+  },
+  {
+    id: '.delete',
+    event: 'submit',
+    handler: checkBeforeDelete
   }
 ];
 
@@ -110,7 +115,18 @@ function removeChild(elt) {
   document.querySelector('.remove').remove();
 }
 
+function checkBeforeDelete(elt) {
+  console.log('checking to delete');
+  let check = confirm('Are you shure you want to delete this?');
+  if (!check) {
+    elt.preventDefault();
+    return false;
+  }
+  return true;
+}
+
 elementIdSet.forEach(item => {
-  document.getElementById(item.id) &&
-    document.getElementById(item.id).addEventListener(item.event, item.handler);
+  document
+    .querySelectorAll(item.id)
+    .forEach(elt => elt.addEventListener(item.event, item.handler));
 });

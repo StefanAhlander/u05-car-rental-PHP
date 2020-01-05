@@ -141,7 +141,6 @@ SQL;
     $sth->execute();
 
     $diff = $sth->fetch()[0];
-    echo $diff;
 
     if($diff <= 86400) {
       $days = 1;
