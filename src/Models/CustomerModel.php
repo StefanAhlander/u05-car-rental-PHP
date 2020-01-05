@@ -3,7 +3,6 @@
 namespace Main\Models;
 
 use Main\Domain\Customer;
-use Main\Model\RentalModel;
 use Main\Exceptions\DbException;
 use Main\Exceptions\NotFoundException;
 use PDO;
@@ -20,7 +19,7 @@ class CustomerModel extends AbstractModel {
 
     $customers = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
     if (empty($customers)) {
-      throw new NotFoundException();
+      throw new NotFoundException('Customer not found.');
     }
 
     return $customers[0];
@@ -29,8 +28,10 @@ class CustomerModel extends AbstractModel {
   public function getAll() {
     $query = "SELECT * FROM customers ORDER BY name";
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
   }
 
@@ -46,8 +47,10 @@ SQL;
     $sth->bindParam("address", $customer["address"], PDO::PARAM_STR);
     $sth->bindParam("postaladdress", $customer["postaladdress"], PDO::PARAM_STR);
     $sth->bindParam("phonenumber", $customer["phonenumber"], PDO::PARAM_STR);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     return $this->getCustomer($customer["personnumber"]);
   }
 
@@ -64,8 +67,10 @@ SQL;
     $sth->bindParam("address", $customer["address"], PDO::PARAM_STR);
     $sth->bindParam("postaladdress", $customer["postaladdress"], PDO::PARAM_STR);
     $sth->bindParam("phonenumber", $customer["phonenumber"], PDO::PARAM_STR);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     return $this->getCustomer($customer["personnumber"]);
   }
   
@@ -74,6 +79,8 @@ SQL;
 
     $sth = $this->db->prepare($query);
     $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
   }
 }

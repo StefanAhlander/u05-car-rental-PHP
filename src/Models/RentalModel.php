@@ -20,16 +20,22 @@ class RentalModel extends AbstractModel {
     $sth = $this->db->prepare($query);
     $sth->bindParam("id", $id, PDO::PARAM_INT);
     $sth->execute();
+    $rentals = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
+   
+    if (empty($rentals)) {
+      throw new NotFoundException('Customer not found.');
+    }
 
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL)[0];
+    return $rentals[0];
   }
 
   public function getAll() {
     $query = "SELECT * FROM rentals";
 
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
   }
 
@@ -43,7 +49,10 @@ SQL;
 
     $sth = $this->db->prepare($query);
     $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    $sth->execute();
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
 
     $query = <<<SQL
 UPDATE cars SET checkedoutby = :personnumber,
@@ -54,8 +63,11 @@ SQL;
     $sth = $this->db->prepare($query);
     $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
     $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $query = <<<SQL
 INSERT INTO rentals (registration, personnumber, checkouttime, checkintime, days, cost)
 VALUES (:registration, :personnumber, CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm"), null, null, null)
@@ -64,8 +76,11 @@ SQL;
     $sth = $this->db->prepare($query);
     $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
     $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $id = $this->db->lastInsertId();
 
     $this->db->commit();
@@ -74,8 +89,6 @@ SQL;
   }
 
   public function closeRental($registration) {
-    $this->db->beginTransaction();
-
     $query = <<<SQL
 SELECT * FROM rentals 
 WHERE registration = :registration
@@ -87,25 +100,37 @@ SQL;
     $sth->execute();
 
     $result = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL)[0];
+   
+    if (empty($result)) {
+      throw new NotFoundException('Customer not found.');
+    }
 
     $id = $result->getID();
     $registration = $result->getRegistration();
     $personnumber = $result->getPersonNumber();
 
+    $this->db->beginTransaction();
+
     $sth = $this->db->prepare("SET @id = :id; SET @registration = :registration; SET @personnumber = :personnumber; ");
     $sth->bindParam(':id', $id, PDO::PARAM_INT);
     $sth->bindParam(':registration', $registration, PDO::PARAM_STR);
     $sth->bindParam(':personnumber', $personnumber, PDO::PARAM_INT);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $query = <<<SQL
 UPDATE customers SET renting = false 
 WHERE personnumber = @personnumber
 SQL;
 
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $query = <<<SQL
 UPDATE cars SET checkedoutby = NULL,
   checkedouttime = NULL
@@ -113,12 +138,18 @@ WHERE registration = @registration
 SQL;
 
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $query = "SELECT * FROM cars WHERE registration = @registration";
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $car = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_CAR)[0];
     $price = $car->getPrice();
 
@@ -129,8 +160,11 @@ WHERE id = @id
 SQL;
 
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $query = <<<SQL
 SELECT TIMESTAMPDIFF(SECOND, 
   (SELECT checkouttime FROM rentals WHERE id = @id), 
@@ -138,8 +172,11 @@ SELECT TIMESTAMPDIFF(SECOND,
 SQL;
 
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $diff = $sth->fetch()[0];
 
     if($diff <= 86400) {
@@ -159,8 +196,11 @@ SQL;
     $sth = $this->db->prepare($query);
     $sth->bindParam("days", $days, PDO::PARAM_INT);
     $sth->bindParam("cost", $cost, PDO::PARAM_STR);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      $this->db->rollBack();
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $this->db->commit();
 
     return $id;  

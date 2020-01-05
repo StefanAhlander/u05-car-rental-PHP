@@ -2,7 +2,7 @@
 
 namespace Main\Models;
 
-use Main\Domain\Book;
+use Main\Domain\Car;
 use Main\Exceptions\DbException;
 use Main\Exceptions\NotFoundException;
 use PDO;
@@ -17,7 +17,7 @@ class CarModel extends AbstractModel {
 
     $cars = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
     if (empty($cars)) {
-      throw new NotFoundException();
+      throw new NotFoundException('Car not found.');
     }
 
     return $cars[0];
@@ -26,7 +26,9 @@ class CarModel extends AbstractModel {
   public function getAllNotRented() {
     $query = 'SELECT * FROM cars WHERE checkedoutby IS NULL ORDER BY make';
     $sth = $this->db->prepare($query);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
 
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
   }
@@ -34,15 +36,18 @@ class CarModel extends AbstractModel {
   public function getAllRented() {
     $query = 'SELECT * FROM cars WHERE checkedoutby IS NOT NULL ORDER BY make';
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
   }
 
   public function getAll() {
     $query = 'SELECT * FROM cars';
     $sth = $this->db->prepare($query);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
 
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
   }
@@ -59,7 +64,9 @@ SQL;
     $sth->bindParam("color", $car["color"], PDO::PARAM_STR);
     $sth->bindParam("year", $car["year"], PDO::PARAM_INT);
     $sth->bindParam("price", $car["price"], PDO::PARAM_INT);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
 
     return $this->get($car["registration"]);
   }
@@ -69,7 +76,9 @@ SQL;
 
     $sth = $this->db->prepare($query);
     $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }  
   }
 
   public function editCar($car) {
@@ -85,7 +94,9 @@ SQL;
     $sth->bindParam("color", $car["color"], PDO::PARAM_STR);
     $sth->bindParam("year", $car["year"], PDO::PARAM_INT);
     $sth->bindParam("price", $car["price"], PDO::PARAM_INT);
-    $sth->execute();
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
 
     return $this->get($car["registration"]);
   }
@@ -93,8 +104,10 @@ SQL;
   public function getMakes() {
     $query = 'SELECT * FROM makes';
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $makes = $sth->fetchAll();
  
     return $this->flatten($makes);
@@ -103,13 +116,18 @@ SQL;
   public function getColors() {
     $query = 'SELECT * FROM colors';
     $sth = $this->db->prepare($query);
-    $sth->execute();
-
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+    
     $colors = $sth->fetchAll();
  
     return $this->flatten($colors);
   }
 
+  /**
+   * Helper function to flatten and return fetched array.
+   */
   private function flatten($arr) {
     $num = count($arr);
     $newArr = [];
@@ -120,5 +138,4 @@ SQL;
 
     return $newArr;
   }
-
 }

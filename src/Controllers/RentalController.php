@@ -13,8 +13,19 @@ class RentalController extends AbstractController {
     $carModel = new CarModel($this->db);
     $customerModel = new CustomerModel($this->db);
 
-    $cars = $carModel->getAllNotRented();
-    $customers = $customerModel->getAll();
+    try {
+      $cars = $carModel->getAllNotRented();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error creating cars not rented.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $customers = $customerModel->getAll();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error creating customers.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["cars" => $cars, "customers" => $customers];
     return $this->render('checkout.twig', $properties);
@@ -34,7 +45,12 @@ class RentalController extends AbstractController {
       return $this->render('error.twig', $properties);
     }
 
-    $rental = $rentalModel->get($id);
+    try {
+      $rental = $rentalModel->get($id);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting rental by id.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["rental" => $rental];
     return $this->render('checkedout.twig', $properties);
@@ -43,7 +59,12 @@ class RentalController extends AbstractController {
   public function checkInCar() {
     $carModel = new CarModel($this->db);
 
-    $cars = $carModel->getAllRented();
+    try {
+      $cars = $carModel->getAllRented();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting all rented cars.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["cars" => $cars];
     return $this->render('checkin.twig', $properties);
@@ -62,7 +83,12 @@ class RentalController extends AbstractController {
       return $this->render('error.twig', $properties);
     }
 
-    $rental = $rentalModel->get($id);
+    try {
+      $rental = $rentalModel->get($id);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting rental by id.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["rental" => $rental];
     return $this->render('checkedin.twig', $properties);
@@ -71,10 +97,14 @@ class RentalController extends AbstractController {
   public function getHistory() {
     $rentalModel = new RentalModel($this->db);
 
-    $rentals = $rentalModel->getAll();
+    try {
+      $rentals = $rentalModel->getAll();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting rental history.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["rentals" => $rentals];
     return $this->render('history.twig', $properties);
   }
-
 }

@@ -1,5 +1,7 @@
 {
   "db": {
+    "host": "127.0.0.1",
+    "dbname": "CarRental",
     "user": "homestead",
     "password": "secret"
   }

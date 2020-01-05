@@ -2,7 +2,6 @@
 
 namespace Main\Controllers;
 
-use Main\Exceptions\NotFoundException;
 use Main\Models\CustomerModel;
 use Main\Core\FilteredMap;
 
@@ -22,6 +21,21 @@ class CustomerController extends AbstractController {
 
     $properties = ["customer" => $customer];
     return $this->render('editcustomer.twig', $properties);
+  }
+
+  public function editedCustomer() {
+    $customerModel = new CustomerModel($this->db);
+    $newCustomer = $this->getCustomerFromForm();
+
+    try {
+      $editedCustomer = $customerModel->editCustomer($newCustomer);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error editing customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $editedCustomer];
+    return $this->render('editedcustomer.twig', $properties);
   }
 
   public function deleteCustomer() {
@@ -51,9 +65,7 @@ class CustomerController extends AbstractController {
     $customerModel = new CustomerModel($this->db);
     $customers = $customerModel->getAll();
 
-    $properties = [
-        'customers' => $customers
-    ];
+    $properties = ['customers' => $customers];
     return $this->render('customers.twig', $properties);
   }
 
@@ -77,21 +89,9 @@ class CustomerController extends AbstractController {
     return $this->render('addedcustomer.twig', $properties);
   }
 
-  public function editedCustomer() {
-    $customerModel = new CustomerModel($this->db);
-    $newCustomer = $this->getCustomerFromForm();
-
-    try {
-      $editedCustomer = $customerModel->editCustomer($newCustomer);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error editing customer.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["customer" => $editedCustomer];
-    return $this->render('editedcustomer.twig', $properties);
-  }
-
+  /**
+   * Helper function to get form data.
+   */
   private function getCustomerFromForm() {
     $fM =  new FilteredMap($this->request->getForm());
     $customer["personnumber"] = $fM->getInt("personnumber");

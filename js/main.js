@@ -1,26 +1,39 @@
+/**
+ * Object containing information on various selectors for elements on which to add
+ * event listners and event handlers.
+ *
+ * selector = selector for elements to attach event listner to
+ * event = what kind of event should trigger handler
+ * handler = function to handle event
+ */
 const elementIdSet = [
   {
-    id: '#validate',
+    selector: '#validate',
     event: 'submit',
     handler: validate
   },
   {
-    id: '#selectMake',
+    selector: '#selectMake',
     event: 'change',
     handler: removeChild
   },
   {
-    id: '#selectColor',
+    selector: '#selectColor',
     event: 'change',
     handler: removeChild
   },
   {
-    id: '.delete',
+    selector: '.delete',
     event: 'submit',
     handler: checkBeforeDelete
   }
 ];
 
+/**
+ * Object containing methods to validate various input data.
+ * Every input field that should be validated has a data-validate attribute contaning
+ * the name of the corresponding method. Forms that should be validated have the validate event handler attached.
+ */
 const validateMethods = {
   personnumber(elt) {
     let returnMessage = '';
@@ -96,6 +109,12 @@ const validateMethods = {
   }
 };
 
+/**
+ * Function that loops over all input fields that should be validated and calls the
+ * corresponding methods and compiles an error message in case of errors.
+ *
+ * @param {element that has the triggered event handler} e
+ */
 function validate(e) {
   const list = document.querySelectorAll('[data-validate]');
   let message = '';
@@ -111,10 +130,18 @@ function validate(e) {
   }
 }
 
+/**
+ * Removes any chiled element that has the remove class.
+ */
 function removeChild() {
   this.querySelector('.remove') && this.querySelector('.remove').remove();
 }
 
+/**
+ * Check to make sure the user really wants to delete the item.
+ *
+ * @param {element of the triggered event} elt
+ */
 function checkBeforeDelete(elt) {
   console.log('checking to delete');
   let check = confirm('Are you shure you want to delete this?');
@@ -125,8 +152,11 @@ function checkBeforeDelete(elt) {
   return true;
 }
 
+/**
+ * Loop over list of event handlers and attach events to present elements.
+ */
 elementIdSet.forEach(item => {
   document
-    .querySelectorAll(item.id)
+    .querySelectorAll(item.selector)
     .forEach(elt => elt.addEventListener(item.event, item.handler));
 });

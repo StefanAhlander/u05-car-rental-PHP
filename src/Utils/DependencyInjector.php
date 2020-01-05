@@ -5,16 +5,16 @@ namespace Main\Utils;
 use Main\Exceptions\NotFoundException;
 
 class DependencyInjector {
-    private $dependencies = [];
+  private $dependencies = [];
 
-    public function set($name, $object) {
-        $this->dependencies[$name] = $object;
-    }
+  public function set($name, $object) {
+    $this->dependencies[$name] = $object;
+  }
 
-    public function get($name) {
-        if (isset($this->dependencies[$name])) {
-            return $this->dependencies[$name];
-        }
-        throw new NotFoundException($name . ' dependency not found.');
+  public function get($name) {
+    if (isset($this->dependencies[$name])) {
+      return $this->dependencies[$name];
     }
+    throw new NotFoundException($name . ' dependency not found.');
+  }
 }

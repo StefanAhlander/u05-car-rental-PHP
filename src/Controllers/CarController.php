@@ -12,18 +12,33 @@ class CarController extends AbstractController {
   public function getAll() {
     $carModel = new CarModel($this->db);
 
-    $cars = $carModel->getAll();
+    try {
+      $cars = $carModel->getAll();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting cars.'];
+      return $this->render('error.twig', $properties);
+    }
 
-    $properties = [
-      'cars' => $cars
-    ];
+    $properties = ['cars' => $cars];
     return $this->render('cars.twig', $properties);
   }
 
   public function editCar($registration) {
     $carModel = new CarModel($this->db);
-    $makes = $carModel->getMakes();
-    $colors = $carModel->getColors();
+
+    try {
+      $makes = $carModel->getMakes();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting makes.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $colors = $carModel->getColors();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting colors.'];
+      return $this->render('error.twig', $properties);
+    }
 
     try {
       $car = $carModel->get($registration);
@@ -51,17 +66,26 @@ class CarController extends AbstractController {
     return $this->render('editedcar.twig', $properties);
   }
 
-
-
   public function add() {
     $carModel = new CarModel($this->db);
-    $makes = $carModel->getMakes();
-    $colors = $carModel->getColors();
+
+    try {
+      $makes = $carModel->getMakes();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting makes.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $colors = $carModel->getColors();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting colors.'];
+      return $this->render('error.twig', $properties);
+    }
 
     $properties = ["makes" => $makes, "colors" => $colors];
     return $this->render('addcar.twig', $properties);
   }
-
 
   public function addedCar() {
     $carModel = new CarModel($this->db);
@@ -99,9 +123,9 @@ class CarController extends AbstractController {
     return $this->render('deletedcar.twig', $properties);
   }
 
-
-
-
+  /**
+   * Helper function to get form data.
+   */
   private function getCarFromForm() {
     $fM =  new FilteredMap($this->request->getForm());
     $car["registration"] = $fM->getString("registration");
@@ -112,62 +136,4 @@ class CarController extends AbstractController {
 
     return $car;
   }
-
-
-
-
-
-
-
-
-    public function borrow(int $bookId): string {
-        $bookModel = new BookModel($this->db);
-
-        try {
-            $book = $bookModel->get($bookId);
-        } catch (NotFoundException $e) {
-            $this->log->warn('Book not found: ' . $bookId);
-            $params = ['errorMessage' => 'Book not found.'];
-            return $this->render('error.twig', $params);
-        }
-
-        if (!$book->getCopy()) {
-            $params = ['errorMessage' => 'There are no copies left.'];
-            return $this->render('error.twig', $params);
-        }
-
-        try {
-            $bookModel->borrow($book, $this->customerId);
-        } catch (DbException $e) {
-            $this->log->warn('Error borrowing book: ' . $e->getMessage());
-            $params = ['errorMessage' => 'Error borrowing book.'];
-            return $this->render('error.twig', $params);
-        }
-
-        return $this->getByUser();
-    }
-
-    public function returnBook(int $bookId): string {
-        $bookModel = new BookModel($this->db);
-
-        try {
-            $book = $bookModel->get($bookId);
-        } catch (NotFoundException $e) {
-            $this->log->warn('Book not found: ' . $bookId);
-            $params = ['errorMessage' => 'Book not found.'];
-            return $this->render('error.twig', $params);
-        }
-
-        $book->addCopy();
-
-        try {
-            $bookModel->returnBook($book, $this->customerId);
-        } catch (DbException $e) {
-            $this->log->warn('Error borrowing book: ' . $e->getMessage());
-            $params = ['errorMessage' => 'Error borrowing book.'];
-            return $this->render('error.twig', $params);
-        }
-
-        return $this->getByUser();
-    }
 }
