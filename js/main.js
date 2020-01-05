@@ -111,8 +111,8 @@ function validate(e) {
   }
 }
 
-function removeChild(elt) {
-  document.querySelector('.remove').remove();
+function removeChild() {
+  this.querySelector('.remove') && this.querySelector('.remove').remove();
 }
 
 function checkBeforeDelete(elt) {
