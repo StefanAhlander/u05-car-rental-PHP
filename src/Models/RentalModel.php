@@ -205,4 +205,32 @@ SQL;
 
     return $id;  
   }
+
+  public function removeCustomer($personnumber) {
+    $query = <<<SQL
+UPDATE rentals 
+SET personnumber = NULL
+WHERE personnumber = :personnumber
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+  }
+
+  public function removeCar($registration) {
+    $query = <<<SQL
+UPDATE rentals 
+SET registration = NULL
+WHERE registration = :registration
+SQL;
+
+    $sth = $this->db->prepare($query);
+    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
+    if (!$sth->execute()) {
+      throw new DbException($sth->errorInfo()[2]);
+    }
+  }
 }

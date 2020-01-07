@@ -10,7 +10,7 @@ use PDO;
 class CustomerModel extends AbstractModel {
   const CLASSNAME = "\Main\Domain\Customer";
 
-  public function getCustomer($personnumber) {
+  public function get($personnumber) {
     $query = "SELECT * FROM customers WHERE personnumber=:personnumber";
 
     $sth = $this->db->prepare($query);
@@ -51,7 +51,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
     
-    return $this->getCustomer($customer["personnumber"]);
+    return $this->get($customer["personnumber"]);
   }
 
   public function editCustomer($customer) {
@@ -71,7 +71,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
     
-    return $this->getCustomer($customer["personnumber"]);
+    return $this->get($customer["personnumber"]);
   }
   
   public function deleteCustomer($personnumber) {

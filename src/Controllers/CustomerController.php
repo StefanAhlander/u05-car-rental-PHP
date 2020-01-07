@@ -3,63 +3,10 @@
 namespace Main\Controllers;
 
 use Main\Models\CustomerModel;
+use Main\Models\RentalModel;
 use Main\Core\FilteredMap;
 
 class CustomerController extends AbstractController {
-
-  public function editCustomer() {
-    $customerModel = new CustomerModel($this->db);
-    $fM =  new FilteredMap($this->request->getForm());
-    $personnumber = $fM->getInt("personnumber");
-
-    try {
-      $customer = $customerModel->getCustomer($personnumber);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting customer.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["customer" => $customer];
-    return $this->render('editcustomer.twig', $properties);
-  }
-
-  public function editedCustomer() {
-    $customerModel = new CustomerModel($this->db);
-    $newCustomer = $this->getCustomerFromForm();
-
-    try {
-      $editedCustomer = $customerModel->editCustomer($newCustomer);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error editing customer.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["customer" => $editedCustomer];
-    return $this->render('editedcustomer.twig', $properties);
-  }
-
-  public function deleteCustomer() {
-    $customerModel = new CustomerModel($this->db);
-    $fM =  new FilteredMap($this->request->getForm());
-    $personnumber = $fM->getInt("personnumber");
-
-    try {
-      $customer = $customerModel->getCustomer($personnumber);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Customer not found.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    try {
-      $customerModel->deleteCustomer($personnumber);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error deleteing customer.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["customer" => $customer];
-    return $this->render('deletedcustomer.twig', $properties);
-  }
 
   public function getAll() {
     $customerModel = new CustomerModel($this->db);
@@ -87,6 +34,68 @@ class CustomerController extends AbstractController {
 
     $properties = ["customer" => $addedCustomer];
     return $this->render('addedcustomer.twig', $properties);
+  }
+
+  public function editCustomer() {
+    $customerModel = new CustomerModel($this->db);
+    $fM =  new FilteredMap($this->request->getForm());
+    $personnumber = $fM->getInt("personnumber");
+
+    try {
+      $customer = $customerModel->get($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $customer];
+    return $this->render('editcustomer.twig', $properties);
+  }
+
+  public function editedCustomer() {
+    $customerModel = new CustomerModel($this->db);
+    $newCustomer = $this->getCustomerFromForm();
+
+    try {
+      $editedCustomer = $customerModel->editCustomer($newCustomer);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error editing customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $editedCustomer];
+    return $this->render('editedcustomer.twig', $properties);
+  }
+
+  public function deleteCustomer() {
+    $customerModel = new CustomerModel($this->db);
+    $rentalModel = new RentalModel($this->db);
+    $fM =  new FilteredMap($this->request->getForm());
+    $personnumber = $fM->getInt("personnumber");
+
+    try {
+      $customer = $customerModel->get($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Customer not found.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $rentalModel->removeCustomer($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error removing customer from rental history.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $customerModel->deleteCustomer($personnumber);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error deleteing customer.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["customer" => $customer];
+    return $this->render('deletedcustomer.twig', $properties);
   }
 
   /**

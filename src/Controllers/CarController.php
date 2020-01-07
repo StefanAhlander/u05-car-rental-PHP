@@ -5,6 +5,7 @@ namespace Main\Controllers;
 use Main\Exceptions\DbException;
 use Main\Exceptions\NotFoundException;
 use Main\Models\CarModel;
+use Main\Models\RentalModel;
 use Main\Core\FilteredMap;
 
 class CarController extends AbstractController {
@@ -104,11 +105,19 @@ class CarController extends AbstractController {
 
   public function deleteCar($registration) {
     $carModel = new CarModel($this->db);
+    $rentalModel = new RentalModel($this->db);
 
     try {
       $car = $carModel->get($registration);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Car not found.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $rentalModel->removeCar($registration);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error removing car from rental history.'];
       return $this->render('error.twig', $properties);
     }
 

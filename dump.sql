@@ -24,14 +24,14 @@ CREATE TABLE cars(
 
 CREATE TABLE rentals(
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  registration CHAR(6) NOT NULL,
-  personnumber BIGINT NOT NULL,
+  registration CHAR(6),
+  personnumber BIGINT,
   checkouttime DATETIME NOT NULL,
   checkintime DATETIME,
   days INT,
   cost FLOAT,
-  FOREIGN KEY (registration) REFERENCES cars(registration) ON DELETE CASCADE,
-  FOREIGN KEY (personnumber) REFERENCES customers(personnumber) ON DELETE CASCADE
+  FOREIGN KEY (registration) REFERENCES cars(registration),
+  FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
 INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber, renting) VALUES
