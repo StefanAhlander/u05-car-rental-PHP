@@ -74,21 +74,11 @@ main h2 {
   text-align: center;
 }
 
-footer {
-  bottom: 0;
-  position: absolute;
-}
-
 .background-dark {
   background-color: var(--dark-bg-color);
   color: var(--color);
   padding: 1em;
   width: 100%;
-}
-
-.copyright {
-  font-size: 1em;
-  text-align: right;
 }
 
 table {

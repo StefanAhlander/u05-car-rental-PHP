@@ -75,7 +75,7 @@ class RentalController extends AbstractController {
 
     $fM =  new FilteredMap($this->request->getForm());
     $registration = $fM->getString("registration");
-
+    
     try {
       $id = $rentalModel->closeRental($registration);
     } catch (\Exception $e) {
