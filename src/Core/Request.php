@@ -1,6 +1,10 @@
 <?php
 namespace Main\Core;
 
+/**
+ * Class to manage http-requests. Provides methods to get
+ * path and form data from a request.
+ */
 class Request {
   private $path, $form;
 

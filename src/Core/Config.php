@@ -4,6 +4,10 @@ namespace Main\Core;
 
 use Main\Exceptions\NotFoundException;
 
+/**
+ * Class to handle configuration of the app. Loads a config file and parses
+ * it's content. Exposes a method to get config-information.
+ */
 class Config {
   private $data;
 

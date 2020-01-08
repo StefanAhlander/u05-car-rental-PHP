@@ -4,7 +4,6 @@
  * Parent class for all controllers. 
  * Sets upp common variables and methods to be inherited by child classes.
  */
-
 namespace Main\Controllers;
 
 use Main\Core\Request;

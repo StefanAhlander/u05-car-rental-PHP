@@ -4,6 +4,10 @@ namespace Main\Utils;
 
 use Main\Exceptions\NotFoundException;
 
+/**
+ * Class to handle dependencies. Instead of passing dependencies separately they
+ * are stored in a common object that gets passed instead.
+ */
 class DependencyInjector {
   private $dependencies = [];
 
