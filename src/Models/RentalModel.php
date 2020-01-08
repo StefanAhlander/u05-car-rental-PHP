@@ -4,11 +4,7 @@ namespace Main\Models;
 
 use Main\Domain\Rental;
 use Main\Domain\Car;
-use Main\Exceptions\DbException;
-use Main\Exceptions\NotFoundException;
-use PDO;
-use DateTime;
-use DateTimeZone;
+use Exception;
 
 /**
  * Class for handling primarily transactions with the database on table rentals. 
@@ -20,38 +16,46 @@ class RentalModel extends DataModel {
   const CLASSNAME_CAR = '\Main\Domain\Car';
 
   /**
-   * Get a specific rental transaction by id.
+   * Get a specific rental transaction by id. 
+   * 
+   * @param { $id = id for the rental transaction to get.}
+   * 
+   * @return  { New Rental object.}
    */
   public function get($id) {
-    $query = "SELECT * FROM rentals WHERE id = :id";
+    $result = parent::getGeneric([
+      "table" => "rentals",
+      "column" => "id",
+      "value" => $id]);
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("id", $id, PDO::PARAM_INT);
-    $sth->execute();
-    $rentals = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
-   
-    if (empty($rentals)) {
-      throw new NotFoundException('Customer not found.');
-    }
-
-    return $rentals[0];
+    return new Rental($result);
   }
 
   /**
-   * Get all transactions from the rentals table.
+   * Get all rentals by calling parent class getAll method. 
+   * 
+   * @return  { Array of new Rental objects.}
    */
   public function getAll() {
-    $query = "SELECT * FROM rentals";
+    $results = parent::getAllGeneric([
+      "table" => "rentals",
+      "order" => "checkouttime"
+    ]);
 
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
+    foreach($results as $result) {
+      $rentals[] = new Rental($result);
     }
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
+
+    return $rentals;
   }
 
   /**
-   * Create and store a new rental transaction. Aslo updates the customers and cars tables.
+   * Create and store a new rental transaction.
+   * Aslo updates the customers and cars tables.
+   * 
+   * @param { $personnumber = person number of the customer who is
+   *                          renting. 
+   *          $registration = licens plate of the rented car.}
    */
   public function createRental($personnumber, $registration) {
     // Start transaction so all changes can be rolled back if something goes wrong.
@@ -63,12 +67,8 @@ UPDATE customers SET renting = true
 WHERE personnumber = :personnumber
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = ["personnumber" => $personnumber];
+    $this->executeInsertOrUpdate($query, $specs);
 
     // Updates the cars table with information about who and at what time a car was checked out.
     $query = <<<SQL
@@ -77,29 +77,19 @@ UPDATE cars SET checkedoutby = :personnumber,
 WHERE registration = :registration
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
+    $specs = ["personnumber" => $personnumber,
+              "registration" => $registration];
+    $this->executeInsertOrUpdate($query, $specs);
+
     // Create a new rental transaction in the rentals table.
     $query = <<<SQL
 INSERT INTO rentals (registration, personnumber, checkouttime, checkintime, days, cost)
 VALUES (:registration, :personnumber, CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm"), null, null, null)
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    $id = $this->db->lastInsertId();
+    $specs = ["personnumber" => $personnumber,
+              "registration" => $registration];
+    $id = $this->executeInsertOrUpdate($query, $specs);
 
     // Commit all transactions and return id for the new rental.
     $this->db->commit();
@@ -107,115 +97,88 @@ SQL;
     return $id;
   }
 
+  /**
+   * Close a currently open rental transaction.
+   * Aslo updates the customers and cars tables.
+   * 
+   * @param { $registration = licens plate of the rented car.}
+   */
   public function closeRental($registration) {
-    //  Get the rental from the rentals table based on registration.
-    $query = <<<SQL
-SELECT * FROM rentals 
-WHERE registration = :registration
-AND checkintime IS NULL
-SQL;
+    //  Get the rental from the rentals table based on registration and set variables.
+    $specs = ["table" => "rentals",
+              "column" => "registration",
+              "value" => $registration];
+    $amendBy =" AND checkintime IS NULL";
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    $sth->execute();
+    $rental = new Rental($this->getGeneric($specs, $amendBy));
 
-    $result = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL)[0];
-   
-    if (empty($result)) {
-      throw new NotFoundException('Rental not found.');
-    }
+    $id = $rental->getID();
+    $personnumber = $rental->getPersonNumber();
+    $registration = $rental->getRegistration();
+            
+    //  Get info about the car from the cars table to get the rental price.
+    $specs = ["table" => "cars",
+              "column" => "registration",
+              "value" => $registration];
 
-    //  Get information about the rental.
-    $id = $result->getID();
-    $personnumber = $result->getPersonNumber();
-    $registration = $result->getRegistration();
+    $car = new Car(parent::getGeneric($specs));
+
+    $price = $car->getPrice();
 
     //  Start transaction.
     $this->db->beginTransaction();
 
-    //  Set variables for repeated use.
-    $sth = $this->db->prepare("SET @id = :id; SET @registration = :registration; SET @personnumber = :personnumber; ");
-    $sth->bindParam(':id', $id, PDO::PARAM_INT);
-    $sth->bindParam(':registration', $registration, PDO::PARAM_STR);
-    $sth->bindParam(':personnumber', $personnumber, PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
     //  If customer is renting less than two cars update customer table to show the customer as not renting.
-    $query = "SELECT COUNT(personnumber) FROM rentals WHERE personnumber = @personnumber AND checkintime IS NULL";
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    $result = $sth->fetch();
+    $query = "SELECT COUNT(personnumber) FROM rentals WHERE personnumber = " . $personnumber;
 
-    if ($result[0] < 2) {
-      $query = <<<SQL
-      UPDATE customers SET renting = false 
-      WHERE personnumber = @personnumber
-      SQL;
+    $specs = ["table" => "rentals",
+              "column" => "personnumber",
+              "value" => $personnumber];
+    $amendBy = " AND checkintime IS NULL";
+
+    $results = parent::executeQuery($query, $specs, $amendBy);
+
+    if (count($results) == 0) {
+      throw new Exception("The customer is not registered as renting. RentalModel->closeRental");
+    }
+
+    if ($results[0][0] < 2) {
+      $query = "UPDATE customers SET renting = false WHERE personnumber = :personnumber";
       
-          $sth = $this->db->prepare($query);
-          if (!$sth->execute()) {
-            $this->db->rollBack();
-            throw new DbException($sth->errorInfo()[2]);
-          }
+      $specs = ["personnumber" => $personnumber];
+      parent::insertOrUpdateGeneric($query, $specs);
     }
-    
-    //  Set the car as not being checked out.
-    $query = <<<SQL
-UPDATE cars SET checkedoutby = NULL,
-  checkedouttime = NULL
-WHERE registration = @registration
-SQL;
 
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    //  Get info about the car from the cars table to get the rental price.
-    $query = "SELECT * FROM cars WHERE registration = @registration";
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    $car = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_CAR)[0];
-    $price = $car->getPrice();
+    //  Set the car as not being checked out.
+    $query = "UPDATE cars SET checkedoutby = NULL, checkedouttime = NULL WHERE registration = :registration";
+
+    $specs = ["registration" => $registration];
+    $this->executeInsertOrUpdate($query, $specs);
 
     //  Set the checkin time in rentals table.
     $query = <<<SQL
 UPDATE rentals 
 SET checkintime = CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm")
-WHERE id = @id
+WHERE id = :id
 SQL;
 
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = ["id" => $id];
+    $this->executeInsertOrUpdate($query, $specs);
     
     // Calculate the number of days the car has been rented by using mysql-diff function.
     $query = <<<SQL
 SELECT TIMESTAMPDIFF(SECOND, 
-  (SELECT checkouttime FROM rentals WHERE id = @id), 
-  (SELECT checkintime FROM rentals WHERE id = @id))
+  (SELECT checkouttime FROM rentals WHERE id = :id), 
+  (SELECT checkintime FROM rentals WHERE id = :id))
 SQL;
 
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
+    $specs = ["id" => $id];
+    try {
+      $diff = parent::executeQuery($query, $specs)[0][0];
+    } catch (\Exception $e) {
       $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
+      throw $e;
     }
-    
-    $diff = $sth->fetch()[0];
 
     if($diff <= 86400) {
       $days = 1;
@@ -229,16 +192,13 @@ SQL;
     $query = <<<SQL
 UPDATE rentals 
 SET days = :days, cost = :cost
-WHERE id = @id
+WHERE id = :id
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("days", $days, PDO::PARAM_INT);
-    $sth->bindParam("cost", $cost, PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      $this->db->rollBack();
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = ["id" => $id,
+              "days" => $days,
+              "cost" => $cost];
+    $this->executeInsertOrUpdate($query, $specs);
     
     // Commit all transactions and return id from rentals table.
     $this->db->commit();
@@ -247,38 +207,41 @@ SQL;
   }
 
   /**
-   * Function to remove a specific customers person number from the rentals table.
-   * Called from CustomerController.
+   * Function to remove a specific customers person number from the rentals table
+   * by calling parent class generic removeOccurance method.
    */
   public function removeCustomer($personnumber) {
-    $query = <<<SQL
-UPDATE rentals 
-SET personnumber = NULL
-WHERE personnumber = :personnumber
-SQL;
-
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    parent::removeOccurance([
+      "table" => "rentals",
+      "column" => "personnumber",
+      "value" => $personnumber]);
   }
 
   /**
-   * Function to remove a specific cars registration number from the rentals table.
-   * Called from CarController.
+   * Function to remove a specific cars registration number from the rentals table
+   * by calling parent class generic removeOccurance method.
    */
   public function removeCar($registration) {
-    $query = <<<SQL
-UPDATE rentals 
-SET registration = NULL
-WHERE registration = :registration
-SQL;
+    parent::removeOccurance([
+      "table" => "rentals",
+      "column" => "registration",
+      "value" => $registration]);
+  }
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
+  /**
+   * Helper function to avoid repetition. Use within transaction to be able to
+   * rollback any changes if something throws an error. 
+   * 
+   * @param { $query = the query passed on from the calling function. 
+   *          $specs = the specs passed on from the calling function.}
+   */
+  public function executeInsertOrUpdate($query, $specs) {
+    try {
+      $id = parent::insertOrUpdateGeneric($query, $specs);
+    } catch (\Exception $e) {
+      $this->db->rollBack();
+      throw $e;
     }
+    return $id;
   }
 }

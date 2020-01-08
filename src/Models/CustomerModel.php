@@ -3,84 +3,101 @@
 namespace Main\Models;
 
 use Main\Domain\Customer;
-use Main\Exceptions\DbException;
-use Main\Exceptions\NotFoundException;
-use PDO;
 
+/**
+ * Model for hadling customer data providing a simple interface
+ * for the CustomerController. Extends and uses the DataModel
+ * for communication with the database.
+ */
 class CustomerModel extends DataModel {
   const CLASSNAME = "\Main\Domain\Customer";
 
+  /**
+   * Get ustomers by calling parent class get method. 
+   * 
+   * @param { $personnumber = person number for the customer to get.}
+   * 
+   * @return  { New Customer object.}
+   */
   public function get($personnumber) {
-    $query = "SELECT * FROM customers WHERE personnumber=:personnumber";
+    $result = parent::getGeneric([
+      "table" => "customers",
+      "column" => "personnumber",
+      "value" => $personnumber]);
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    $sth->execute();
-
-    $customers = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
-    if (empty($customers)) {
-      throw new NotFoundException('Customer not found.');
-    }
-
-    return $customers[0];
+    return new Customer($result);
   }
 
+  /**
+   * Get all customers by calling parent class getAll method. 
+   * 
+   * @return  { Array of new Customer objects.}
+   */
   public function getAll() {
-    $query = "SELECT * FROM customers ORDER BY name";
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
+    $results = parent::getAllGeneric([
+      "table" => "customers",
+      "order" => "name"
+    ]);
+
+    foreach($results as $result) {
+      $customers[] = new Customer($result);
     }
-    
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
+
+    return $customers;
   }
 
-  public function createCustomer($customer) {
+  /**
+   * Insert (create) new customer in the customers table by calling the parent class
+   * create method. 
+   * 
+   * @param { $customer = customer object to create new row from.}
+   * 
+   * @return  { Customer object created from the inserted data.}
+   */
+  public function create($customer) {
     $query = <<<SQL
 INSERT INTO customers(personnumber, name, address, postaladdress, phonenumber, renting)
-VALUES(:personnumber, :name, :address, :postaladdress, :phonenumber, false)
+VALUES(:personnumber, :name, :address, :postaladdress, :phonenumber, FALSE)
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $customer["personnumber"], PDO::PARAM_INT);
-    $sth->bindParam("name", $customer["name"], PDO::PARAM_STR);
-    $sth->bindParam("address", $customer["address"], PDO::PARAM_STR);
-    $sth->bindParam("postaladdress", $customer["postaladdress"], PDO::PARAM_STR);
-    $sth->bindParam("phonenumber", $customer["phonenumber"], PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = $customer->toArray();
     
-    return $this->get($customer["personnumber"]);
+    parent::insertOrUpdateGeneric($query, $specs);
+
+    return $this->get($customer->getPersonNumber());
   }
 
-  public function editCustomer($customer) {
+  /**
+   * Update (modify) customer in the customers table by calling the parent class
+   * edit method. 
+   * 
+   * @param { $customer = customer object to base the update on.}
+   * 
+   * @return  { Customer object created from the updated data.}
+   */
+  public function edit($customer) {
     $query = <<<SQL
 UPDATE customers
-SET name=:name, address=:address, postaladdress=:postaladdress, phonenumber=:phonenumber
+SET name=:name, address=:address, postaladdress=:postaladdress, phonenumber=:phonenumber, renting=FALSE
 WHERE personnumber=:personnumber
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $customer["personnumber"], PDO::PARAM_INT);
-    $sth->bindParam("name", $customer["name"], PDO::PARAM_STR);
-    $sth->bindParam("address", $customer["address"], PDO::PARAM_STR);
-    $sth->bindParam("postaladdress", $customer["postaladdress"], PDO::PARAM_STR);
-    $sth->bindParam("phonenumber", $customer["phonenumber"], PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    return $this->get($customer["personnumber"]);
+    $specs = $customer->toArray();
+
+    parent::insertOrUpdateGeneric($query, $specs);
+
+    return $this->get($customer->getPersonNumber());
   }
   
-  public function deleteCustomer($personnumber) {
-    $query = "DELETE FROM customers WHERE personnumber=:personnumber";
-
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("personnumber", $personnumber, PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
+  /**
+   * Delete customer by calling parent class delete method. 
+   * 
+   * @param { $personnumber = person number for the customer to delete.}
+   */
+  public function delete($personnumber) {
+    parent::deleteGeneric([
+      "table" => "customers",
+      "column" => "personnumber",
+      "value" => $personnumber]);
   }
 }

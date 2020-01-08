@@ -2,6 +2,7 @@
 
 namespace Main\Controllers;
 
+use Main\Domain\Customer;
 use Main\Models\CustomerModel;
 use Main\Models\RentalModel;
 use Main\Core\FilteredMap;
@@ -13,6 +14,8 @@ class CustomerController extends AbstractController {
     $customers = $customerModel->getAll();
 
     $properties = ['customers' => $customers];
+    //die(var_dump($properties));
+
     return $this->render('customers.twig', $properties);
   }
 
@@ -26,7 +29,7 @@ class CustomerController extends AbstractController {
     $newCustomer = $this->getCustomerFromForm();
 
     try {
-      $addedCustomer = $customerModel->createCustomer($newCustomer);
+      $addedCustomer = $customerModel->create($newCustomer);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error creating customer.'];
       return $this->render('error.twig', $properties);
@@ -52,12 +55,14 @@ class CustomerController extends AbstractController {
     return $this->render('editcustomer.twig', $properties);
   }
 
+
+
   public function editedCustomer() {
     $customerModel = new CustomerModel($this->db);
     $newCustomer = $this->getCustomerFromForm();
 
     try {
-      $editedCustomer = $customerModel->editCustomer($newCustomer);
+      $editedCustomer = $customerModel->edit($newCustomer);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error editing customer.'];
       return $this->render('error.twig', $properties);
@@ -66,6 +71,10 @@ class CustomerController extends AbstractController {
     $properties = ["customer" => $editedCustomer];
     return $this->render('editedcustomer.twig', $properties);
   }
+
+
+
+
 
   public function deleteCustomer() {
     $customerModel = new CustomerModel($this->db);
@@ -88,7 +97,7 @@ class CustomerController extends AbstractController {
     }
 
     try {
-      $customerModel->deleteCustomer($personnumber);
+      $customerModel->delete($personnumber);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error deleteing customer.'];
       return $this->render('error.twig', $properties);
@@ -109,6 +118,6 @@ class CustomerController extends AbstractController {
     $customer["postaladdress"] = $fM->getString("postaladdress");
     $customer["phonenumber"] = $fM->getString("phonenumber");
 
-    return $customer;
+    return new Customer($customer);
   }
 }

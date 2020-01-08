@@ -4,6 +4,11 @@ namespace Main\Models;
 
 use Main\Domain\Car;
 
+/**
+ * Model for hadling car data providing a simple interface
+ * for the CarController. Extends and uses the DataModel
+ * for communication with the database.
+ */
 class CarModel extends DataModel {
 
   /**
@@ -65,6 +70,8 @@ class CarModel extends DataModel {
   public function getAllRented() {
     $results = parent::executeQuery('SELECT * FROM cars WHERE checkedoutby IS NOT NULL ORDER BY make');
 
+    $cars = [];
+    
     foreach($results as $result) {
       $cars[] = new Car($result);
     }

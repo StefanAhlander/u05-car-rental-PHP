@@ -2,6 +2,10 @@
 
 namespace Main\Domain;
 
+/**
+ * Car object with constructor, getter methods and method to turn
+ * object properties into an associative array.
+ */
 class Car {
   private $registration;
   private $make;
@@ -18,6 +22,7 @@ class Car {
     $this->year = $specs["year"];
     $this->price = $specs["price"];
 
+    // Tests if optional values are set. If not, set properies to NULL.
     if (isset($specs["checkedoutby"])) {
       $this->checkedoutby = $specs["checkedoutby"];
     } else {
@@ -59,6 +64,7 @@ class Car {
     return $this->checkedouttime;
   }
 
+  // Method to get object properties and create an associative array.
   public function toArray() {
     $arr["registration"] = $this->registration;
     $arr["make"] = $this->make;
