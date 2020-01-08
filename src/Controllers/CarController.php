@@ -2,8 +2,7 @@
 
 namespace Main\Controllers;
 
-use Main\Exceptions\DbException;
-use Main\Exceptions\NotFoundException;
+use Main\Domain\Car;
 use Main\Models\CarModel;
 use Main\Models\RentalModel;
 use Main\Core\FilteredMap;
@@ -16,7 +15,7 @@ class CarController extends AbstractController {
     try {
       $cars = $carModel->getAll();
     } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting cars.'];
+      $properties = ['errorMessage' => 'Error getting cars from Controller.'];
       return $this->render('error.twig', $properties);
     }
 
@@ -52,20 +51,8 @@ class CarController extends AbstractController {
     return $this->render('editcar.twig', $properties);
   }
 
-  public function editedCar() {
-    $carModel = new CarModel($this->db);
-    $car = $this->getCarFromForm();
 
-    try {
-      $editedCar = $carModel->editCar($car);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error editing car.'];
-      return $this->render('error.twig', $properties);
-    }
 
-    $properties = ["car" => $editedCar];
-    return $this->render('editedcar.twig', $properties);
-  }
 
   public function add() {
     $carModel = new CarModel($this->db);
@@ -88,12 +75,32 @@ class CarController extends AbstractController {
     return $this->render('addcar.twig', $properties);
   }
 
+
+  
+  public function editedCar() {
+    $carModel = new CarModel($this->db);
+    $car = $this->getCarFromForm();
+
+    try {
+      $editedCar = $carModel->edit($car);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error editing car.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["car" => $editedCar];
+    return $this->render('editedcar.twig', $properties);
+  }
+
+
+
+
   public function addedCar() {
     $carModel = new CarModel($this->db);
     $newCar = $this->getCarFromForm();
 
     try {
-      $addedCar = $carModel->addCar($newCar);
+      $addedCar = $carModel->create($newCar);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error adding car.'];
       return $this->render('error.twig', $properties);
@@ -102,6 +109,10 @@ class CarController extends AbstractController {
     $properties = ["car" => $addedCar];
     return $this->render('addedcar.twig', $properties);
   }
+
+
+
+
 
   public function deleteCar($registration) {
     $carModel = new CarModel($this->db);
@@ -122,7 +133,7 @@ class CarController extends AbstractController {
     }
 
     try {
-      $carModel->deleteCar($registration);
+      $carModel->delete($registration);
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error deleteing car.'];
       return $this->render('error.twig', $properties);
@@ -143,6 +154,6 @@ class CarController extends AbstractController {
     $car["year"] = $fM->getInt("year");
     $car["price"] = $fM->getInt("price");
 
-    return $car;
+    return new Car($car);
   }
 }

@@ -3,130 +3,155 @@
 namespace Main\Models;
 
 use Main\Domain\Car;
-use Main\Exceptions\DbException;
-use Main\Exceptions\NotFoundException;
-use PDO;
 
-class CarModel extends AbstractModel {
-  const CLASSNAME = '\Main\Domain\Car';
+class CarModel extends DataModel {
 
+  /**
+   * Get car by calling parent class get method. 
+   * 
+   * @param { $registration = licens plate for the car to get.}
+   * 
+   * @return  { New Car object.}
+   */
   public function get($registration) {
-    $query = 'SELECT * FROM cars WHERE registration = :registration';
-    $sth = $this->db->prepare($query);
-    $sth->execute(['registration' => $registration]);
+    $result = parent::getGeneric([
+      "table" => "cars",
+      "column" => "registration",
+      "value" => $registration]);
 
-    $cars = $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
-    if (empty($cars)) {
-      throw new NotFoundException('Car not found.');
-    }
-
-    return $cars[0];
+    return new Car($result);
   }
 
-  public function getAllNotRented() {
-    $query = 'SELECT * FROM cars WHERE checkedoutby IS NULL ORDER BY make';
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
-
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
-  }
-
-  public function getAllRented() {
-    $query = 'SELECT * FROM cars WHERE checkedoutby IS NOT NULL ORDER BY make';
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
-  }
-
+  /**
+   * Get all cars by calling parent class getAll method. 
+   * 
+   * @return  { Array of new Car objects.}
+   */
   public function getAll() {
-    $query = 'SELECT * FROM cars';
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
+    $results = parent::getAllGeneric([
+      "table" => "cars",
+      "order" => "make"
+    ]);
+
+    foreach($results as $result) {
+      $cars[] = new Car($result);
     }
 
-    return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME);
+    return $cars;
+  }
+  
+  /**
+   * Get all cars that are currently not rented by calling parent class
+   * executeQuery method. 
+   * 
+   * @return  { Array of new Car objects.}
+   */
+  public function getAllNotRented() {
+    $results = parent::executeQuery('SELECT * FROM cars WHERE checkedoutby IS NULL ORDER BY make');
+
+    foreach($results as $result) {
+      $cars[] = new Car($result);
+    }
+
+    return $cars;
+  }
+  
+  /**
+   * Get all cars that are currently rentedby calling parent class
+   * executeQuery method. 
+   * 
+   * @return  { Array of new Car objects.}
+   */
+  public function getAllRented() {
+    $results = parent::executeQuery('SELECT * FROM cars WHERE checkedoutby IS NOT NULL ORDER BY make');
+
+    foreach($results as $result) {
+      $cars[] = new Car($result);
+    }
+
+    return $cars;
   }
 
-  public function addCar($car) {
+  /**
+   * Insert (create) new car in the cars table by calling the parent class
+   * create method. 
+   * 
+   * @param { $car = car object to create new row from.}
+   * 
+   * @return  { Car object created from the inserted data.}
+   */
+  public function create($car) {
     $query = <<<SQL
 INSERT INTO cars(registration, make, color, year, price, checkedoutby, checkedouttime)
-VALUES(:registration, :make, :color, :year, :price, null, null)
+VALUES(:registration, :make, :color, :year, :price, :checkedoutby, :checkedouttime)
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("registration", $car["registration"], PDO::PARAM_STR);
-    $sth->bindParam("make", $car["make"], PDO::PARAM_STR);
-    $sth->bindParam("color", $car["color"], PDO::PARAM_STR);
-    $sth->bindParam("year", $car["year"], PDO::PARAM_INT);
-    $sth->bindParam("price", $car["price"], PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = $car->toArray();
+    
+    parent::insertOrUpdateGeneric($query, $specs);
 
-    return $this->get($car["registration"]);
+    return $this->get($car->getRegistration());
   }
 
-  public function deleteCar($registration) {
-    $query = "DELETE FROM cars WHERE registration=:registration";
-
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("registration", $registration, PDO::PARAM_STR);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }  
-  }
-
-  public function editCar($car) {
+  /**
+   * Update (modify) car in the cars table by calling the parent class
+   * edit method. 
+   * 
+   * @param { $car = car object to base the update on.}
+   * 
+   * @return  { Car object created from the updated data.}
+   */
+  public function edit($car) {
     $query = <<<SQL
 UPDATE cars
-SET make=:make, color=:color, year=:year, price=:price
+SET make=:make, color=:color, year=:year, price=:price, checkedoutby=:checkedoutby, checkedouttime=:checkedouttime
 WHERE registration=:registration
 SQL;
 
-    $sth = $this->db->prepare($query);
-    $sth->bindParam("registration", $car["registration"], PDO::PARAM_STR);
-    $sth->bindParam("make", $car["make"], PDO::PARAM_STR);
-    $sth->bindParam("color", $car["color"], PDO::PARAM_STR);
-    $sth->bindParam("year", $car["year"], PDO::PARAM_INT);
-    $sth->bindParam("price", $car["price"], PDO::PARAM_INT);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
+    $specs = $car->toArray();
+        
+    parent::insertOrUpdateGeneric($query, $specs);
 
-    return $this->get($car["registration"]);
+    return $this->get($car->getRegistration());
   }
 
+  /**
+   * Delete car by calling parent class delete method. 
+   * 
+   * @param { $registration = licens plate for the car to delete.}
+   */
+  public function delete($registration) {
+    parent::deleteGeneric([
+      "table" => "cars",
+      "column" => "registration",
+      "value" => $registration]);
+  }
+
+  /**
+   * Get all possible car makes from the makes table. 
+   */
   public function getMakes() {
-    $query = 'SELECT * FROM makes';
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    $makes = $sth->fetchAll();
+    $makes = parent::executeQuery('SELECT * FROM makes');
  
     return $this->flatten($makes);
   }
 
+  /**
+   * Get all possible car colors from the colors table. 
+   */
   public function getColors() {
-    $query = 'SELECT * FROM colors';
-    $sth = $this->db->prepare($query);
-    if (!$sth->execute()) {
-      throw new DbException($sth->errorInfo()[2]);
-    }
-    
-    $colors = $sth->fetchAll();
+    $colors = parent::executeQuery('SELECT * FROM colors');
  
     return $this->flatten($colors);
   }
 
   /**
-   * Helper function to flatten and return fetched array.
+   * Helper function to flatten the array of results fetched from 
+   * the database, also removing duplicate indexed values.
+   * 
+   * @param {$arr = array to be flattened.}
+   * 
+   * @return  { The new array free from duplication.}
    */
   private function flatten($arr) {
     $num = count($arr);

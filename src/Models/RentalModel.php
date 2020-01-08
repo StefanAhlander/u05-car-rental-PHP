@@ -10,10 +10,18 @@ use PDO;
 use DateTime;
 use DateTimeZone;
 
-class RentalModel extends AbstractModel {
+/**
+ * Class for handling primarily transactions with the database on table rentals. 
+ * Some complicatded transactions affecting the cars and customers tables are also handled
+ * here because they are part of larger operations involving multiple tables.
+ */
+class RentalModel extends DataModel {
   const CLASSNAME_RENTAL = '\Main\Domain\Rental';
   const CLASSNAME_CAR = '\Main\Domain\Car';
 
+  /**
+   * Get a specific rental transaction by id.
+   */
   public function get($id) {
     $query = "SELECT * FROM rentals WHERE id = :id";
 
@@ -29,6 +37,9 @@ class RentalModel extends AbstractModel {
     return $rentals[0];
   }
 
+  /**
+   * Get all transactions from the rentals table.
+   */
   public function getAll() {
     $query = "SELECT * FROM rentals";
 
@@ -39,9 +50,14 @@ class RentalModel extends AbstractModel {
     return $sth->fetchAll(PDO::FETCH_CLASS, self::CLASSNAME_RENTAL);
   }
 
+  /**
+   * Create and store a new rental transaction. Aslo updates the customers and cars tables.
+   */
   public function createRental($personnumber, $registration) {
+    // Start transaction so all changes can be rolled back if something goes wrong.
     $this->db->beginTransaction();
 
+    // Set renting value as true in the customers table.
     $query = <<<SQL
 UPDATE customers SET renting = true 
 WHERE personnumber = :personnumber
@@ -54,6 +70,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
 
+    // Updates the cars table with information about who and at what time a car was checked out.
     $query = <<<SQL
 UPDATE cars SET checkedoutby = :personnumber,
   checkedouttime = CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm")
@@ -68,6 +85,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
     
+    // Create a new rental transaction in the rentals table.
     $query = <<<SQL
 INSERT INTO rentals (registration, personnumber, checkouttime, checkintime, days, cost)
 VALUES (:registration, :personnumber, CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm"), null, null, null)
@@ -83,6 +101,7 @@ SQL;
     
     $id = $this->db->lastInsertId();
 
+    // Commit all transactions and return id for the new rental.
     $this->db->commit();
 
     return $id;
@@ -183,9 +202,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
     
-
     // Calculate the number of days the car has been rented by using mysql-diff function.
-
     $query = <<<SQL
 SELECT TIMESTAMPDIFF(SECOND, 
   (SELECT checkouttime FROM rentals WHERE id = @id), 
@@ -223,6 +240,7 @@ SQL;
       throw new DbException($sth->errorInfo()[2]);
     }
     
+    // Commit all transactions and return id from rentals table.
     $this->db->commit();
 
     return $id;  

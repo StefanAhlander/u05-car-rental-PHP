@@ -7,7 +7,7 @@ use Main\Exceptions\DbException;
 use Main\Exceptions\NotFoundException;
 use PDO;
 
-class CustomerModel extends AbstractModel {
+class CustomerModel extends DataModel {
   const CLASSNAME = "\Main\Domain\Customer";
 
   public function get($personnumber) {
