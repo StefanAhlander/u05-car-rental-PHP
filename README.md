@@ -19,5 +19,13 @@ are optional.
 
 You should be good to go.
 
+## Live version URL
+(The live version will be live temporarily as part of the assignement and may be taken down any time.)
+https://aahlander.se/u05-car-rental/
+
+## Documentation
+As part of the assignement a short repport is included in the main folder. The code is also extensibly
+commented and should be fairly easy to follow.
+
 ## License:
 You must be kidding. All code free for all to use as they please.
