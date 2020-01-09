@@ -18,13 +18,13 @@
       <td>{{ customer.postaladdress }}</td>
       <td>{{ customer.phonenumber }}</td>
       <td>
-        <form method="post" action="/editcustomer">
+        <form method="post" action="http://car-rental.test/editcustomer">
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
           <input type="submit" value="Edit" {% if customer.renting == true %}disabled{% endif %}>
         </form>
       </td>
       <td>
-        <form class="delete" method="post" action="/deletecustomer">
+        <form class="delete" method="post" action="http://car-rental.test/deletecustomer">
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
           <input type="submit" value="Delete" {% if customer.renting == true %}disabled{% endif %}>
         </form>
@@ -33,7 +33,7 @@
 {% endfor %}
 
 </table>
-  <form method="post" action="/addcustomer">
+  <form method="post" action="http://car-rental.test/addcustomer">
     <input type="submit" value="Add customer">
   </form>
 {% endblock %}

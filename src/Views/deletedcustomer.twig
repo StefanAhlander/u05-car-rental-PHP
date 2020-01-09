@@ -25,13 +25,13 @@
       <td>{{ customer.postaladdress }}</td>
       <td>{{ customer.phonenumber }}</td>
       <td>
-      <form method="post" action="/addedcustomer">
+      <form method="post" action="http://car-rental.test/addedcustomer">
         <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
         <input style="display: none" name="name" type="text" value="{{ customer.name }}" >
         <input style="display: none" name="address" type="text" value="{{ customer.address }}" >
         <input style="display: none" name="postaladdress" type="text" value="{{ customer.postaladdress }}" >
         <input style="display: none" name="phonenumber" type="text" value="{{ customer.phonenumber }}" >
-        <input class="btn-standard" type="submit" value="Undo">
+        <input type="submit" value="Undo">
       </form>
     </td>
     <td>

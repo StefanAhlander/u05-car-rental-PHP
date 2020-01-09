@@ -17,15 +17,15 @@
       <td>{{ customer.postaladdress }}</td>
       <td>{{ customer.phonenumber }}</td>
       <td>
-      <form method="post" action="/editcustomer">
+      <form method="post" action="http://car-rental.test/editcustomer">
         <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
         <input class="btn-standard" type="submit" value="Edit" {% if customer.renting == true %}disabled{% endif %}>
       </form>
     </td>
       <td>
-        <form method="post" action="/deletecustomer" >
+        <form class="delete" method="post" action="http://car-rental.test/deletecustomer" >
           <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
-          <input class="btn-standard" type="submit" value="Delete" onclick="return confirm('Are you absolutely sure you want to delete this customer?')" {% if customer.renting == true %}disabled{% endif %}>
+          <input type="submit" value="Delete" {% if customer.renting == true %}disabled{% endif %}>
         </form>
       </td>
     </tr>
