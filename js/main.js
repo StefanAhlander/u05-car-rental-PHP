@@ -38,7 +38,7 @@ const validateMethods = {
   personnumber(elt) {
     let returnMessage = '';
 
-    let num = elt.value.replace(/[-\s]/g, '');
+    let num = (elt.value = elt.value.replace(/[-\s]/g, ''));
     if (!/^\d{12}$/.test(num)) {
       return `Person number should be 12 figures and only numbers.\n`;
     }
@@ -68,7 +68,7 @@ const validateMethods = {
   phonenumber(elt) {
     let returnMessage = '';
 
-    let num = elt.value.replace(/[-\s]/g, '');
+    let num = (elt.value = elt.value.replace(/[-\s]/g, ''));
     if (!/^0\d{9}$/.test(num)) {
       returnMessage += `Phonenumber should be 10 figures, start with 0 and only contain numbers.\n`;
     }
@@ -87,7 +87,7 @@ const validateMethods = {
   year(elt) {
     let returnMessage = '';
 
-    let num = elt.value.replace(/[-\s]/g, '');
+    let num = (elt.value = elt.value.replace(/[-\s]/g, ''));
     if (!/^\d{4}$/.test(num) || num < 1900 || num > 2020) {
       returnMessage += `The registration year should be a whole number between 1900 and 2020.\n`;
     }
@@ -96,7 +96,7 @@ const validateMethods = {
   price(elt) {
     let returnMessage = '';
 
-    let num = elt.value.replace(',', '.');
+    let num = (elt.value = elt.value.replace(',', '.'));
     if (!/^[\d.]+$/.test(num)) {
       returnMessage += `The the price should only contain numbers and an optional separator.\n`;
     }
