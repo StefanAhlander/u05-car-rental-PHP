@@ -113,7 +113,7 @@ const validateMethods = {
  * Function that loops over all input fields that should be validated and calls the
  * corresponding methods and compiles an error message in case of errors.
  *
- * @param {element that has the triggered event handler} e
+ * @param { element that has the triggered event handler}
  */
 function validate(e) {
   const list = document.querySelectorAll('[data-validate]');

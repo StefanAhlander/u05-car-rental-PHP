@@ -2,7 +2,10 @@
 
 namespace Main\Controllers;
 
-class ErrorController extends AbstractController {
+/**
+ * Renders an error view for page not found.
+ */
+class ErrorController extends ParentController {
   public function notFound() {
     $properties = ['errorMessage' => 'Page not found!'];
     return $this->render('error.twig', $properties);

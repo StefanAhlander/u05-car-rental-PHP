@@ -9,7 +9,7 @@ namespace Main\Controllers;
 use Main\Core\Request;
 use Main\Utils\DependencyInjector;
 
-abstract class AbstractController {
+abstract class ParentController {
   protected $request;
   protected $db;
   protected $config;
@@ -19,7 +19,6 @@ abstract class AbstractController {
   public function __construct(DependencyInjector $di, Request $request) {
     $this->request = $request;
     $this->di = $di;
-
     $this->db = $di->get('PDO');
     $this->view = $di->get('Twig_Environment');
     $this->config = $di->get('Utils\Config');

@@ -7,8 +7,18 @@ use Main\Models\CarModel;
 use Main\Models\RentalModel;
 use Main\Core\FilteredMap;
 
-class CarController extends AbstractController {
+/**
+ * Handles almost all car related functionality as reguested by the provided URI. 
+ */
+class CarController extends ParentController {
 
+  /**
+   * Instantiate the CarModel object and call it's getAll function. 
+   * If there is an error calling the CarModel method populate the
+   * 'properies' variable with an error message and render the 
+   * error view using Twig. If there is no error use the returned array
+   * to populate the 'cars' view using Twig. 
+   */
   public function getAll() {
     $carModel = new CarModel($this->db);
 
@@ -23,6 +33,58 @@ class CarController extends AbstractController {
     return $this->render('cars.twig', $properties);
   }
 
+  /** 
+   * Get makes and colors from their respective tables in the datase. 
+   * Use these arrays to populate the 'add car' view.
+   */
+  public function add() {
+    $carModel = new CarModel($this->db);
+
+    try {
+      $makes = $carModel->getMakes();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting makes.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $colors = $carModel->getColors();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting colors.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["makes" => $makes, "colors" => $colors];
+    return $this->render('addcar.twig', $properties);
+  }
+
+  /** 
+   * Get form data from the 'add car' view form element and call the CarModel with this
+   * information to create a new row in the database representing this new
+   * car. Render view to show the car that was added.
+   */
+  public function addedCar() {
+    $carModel = new CarModel($this->db);
+    $newCar = $this->getCarFromForm();
+
+    try {
+      $addedCar = $carModel->create($newCar);
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error adding car.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    $properties = ["car" => $addedCar];
+    return $this->render('addedcar.twig', $properties);
+  }
+
+  /** 
+   * Get makes and colors from their respective tables in the datase. 
+   * Also call the CarModel method to get stored information about the
+   * car to be edited. Use these arrays to populate the 'edit car' view.
+   * 
+   * @param { $registration = the licens plate for the car passed in the URI.}
+   */
   public function editCar($registration) {
     $carModel = new CarModel($this->db);
 
@@ -51,32 +113,11 @@ class CarController extends AbstractController {
     return $this->render('editcar.twig', $properties);
   }
 
-
-
-
-  public function add() {
-    $carModel = new CarModel($this->db);
-
-    try {
-      $makes = $carModel->getMakes();
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting makes.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    try {
-      $colors = $carModel->getColors();
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting colors.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["makes" => $makes, "colors" => $colors];
-    return $this->render('addcar.twig', $properties);
-  }
-
-
-  
+  /** 
+   * Get form data from the 'edit car' view form element and call the CarModel with this
+   * information to create a new row in the database representing this new
+   * car. Render view to show the car that was edited.
+   */
   public function editedCar() {
     $carModel = new CarModel($this->db);
     $car = $this->getCarFromForm();
@@ -92,28 +133,18 @@ class CarController extends AbstractController {
     return $this->render('editedcar.twig', $properties);
   }
 
-
-
-
-  public function addedCar() {
-    $carModel = new CarModel($this->db);
-    $newCar = $this->getCarFromForm();
-
-    try {
-      $addedCar = $carModel->create($newCar);
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error adding car.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    $properties = ["car" => $addedCar];
-    return $this->render('addedcar.twig', $properties);
-  }
-
-
-
-
-
+  /** 
+   * Call the CarModel to get all information about the car to be deleted. 
+   * Also call the RentalModel to remove all occurances of the car from the rentals table.
+   * Finally call the CarModel to delete the car from the database. Use the previously
+   * gotten information about the car to populate a view showing what car has been 
+   * deleted. Using this information offers the possibility to undo the delete action 
+   * by calling the 'added car' function by navigation that route from the 'deleted view'.
+   * Unfortunately the removal of all occurances from the rentals table can not be
+   * rolled back the same way. 
+   * 
+   * @param { $registration = the licens plate for the car passed in the URI.} 
+   */
   public function deleteCar($registration) {
     $carModel = new CarModel($this->db);
     $rentalModel = new RentalModel($this->db);
@@ -144,7 +175,8 @@ class CarController extends AbstractController {
   }
 
   /**
-   * Helper function to get form data.
+   * Helper function to get form data. Also instantiates a new car object based
+   * on this data.
    */
   private function getCarFromForm() {
     $fM =  new FilteredMap($this->request->getForm());
