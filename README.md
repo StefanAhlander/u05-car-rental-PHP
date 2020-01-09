@@ -14,7 +14,7 @@ Update the config file with the correct credentials for your MySQL database and,
 running in the root directory update the basUrl to the path to the directory where the index.php file
 is stored.
 
-## Use the dump.sql file to set up the MySQL database, run the included commands on the database. The insert commands
+Use the dump.sql file to set up the MySQL database, run the included commands on the database. The insert commands
 are optional.
 
 You should be good to go.
