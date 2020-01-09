@@ -28,7 +28,7 @@
       <td>{{ rental.days }}</td>
       <td>{{ rental.cost }}</td>
       <td>
-        <form method="post" action="http://car-rental.test/checkin">
+        <form method="post" action="{{ baseUrl }}/checkin">
           <input name="registration" value="{{ rental.registration }}" style="display: none">
           <input type="submit" value="Check in car">
         </form>

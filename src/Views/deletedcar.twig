@@ -29,7 +29,7 @@
       <td>{{ car.checkedoutby }}</td>
       <td>{{ car.checkedouttime }}</td>
       <td>
-        <form method="post" action="http://car-rental.test/addedcar">
+        <form method="post" action="{{ baseUrl }}/addedcar">
           <input style="display: none" name="registration" type="text" value="{{ car.registration }}" >
           <input style="display: none" name="make" type="text" value="{{ car.make }}" >
           <input style="display: none" name="color" type="text" value="{{ car.color }}" >

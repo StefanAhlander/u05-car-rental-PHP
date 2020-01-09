@@ -38,12 +38,12 @@
       </td>
       <td>{{ car.checkedouttime }}</td>
       <td>
-        <form method="post" action="http://car-rental.test/editcar/{{ car.registration }}">
+        <form method="post" action="{{ baseUrl }}/editcar/{{ car.registration }}">
           <input class="btn-standard" type="submit" value="Edit" {% if car.checkedoutby == true %}disabled{% endif %}>
         </form>
       </td>
       <td>
-        <form class="delete" method="post" action="http://car-rental.test/deletecar/{{ car.registration }}">
+        <form class="delete" method="post" action="{{ baseUrl }}/deletecar/{{ car.registration }}">
           <input type="submit" value="Delete" {% if car.checkedoutby == true %}disabled{% endif %}>
         </form>
       </td>

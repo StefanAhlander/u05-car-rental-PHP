@@ -4,5 +4,6 @@
     "dbname": "CarRental",
     "user": "homestead",
     "password": "secret"
-  }
+  },
+  "baseUrl": "http://car-rental.test"
 }

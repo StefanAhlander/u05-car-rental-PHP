@@ -25,7 +25,7 @@
       <td>{{ customer.postaladdress }}</td>
       <td>{{ customer.phonenumber }}</td>
       <td>
-      <form method="post" action="http://car-rental.test/addedcustomer">
+      <form method="post" action="{{ baseUrl }}/addedcustomer">
         <input style="display: none" name="personnumber" type="text" value="{{ customer.personnumber }}" >
         <input style="display: none" name="name" type="text" value="{{ customer.name }}" >
         <input style="display: none" name="address" type="text" value="{{ customer.address }}" >

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" type="text/css" href="http://car-rental.test/styles/theme.css">
+    <link rel="stylesheet" type="text/css" href="{{ baseUrl }}/styles/theme.css">
     <title>{% block title %}{% endblock %}</title>  </head>
   <body>
     <header class="background-dark">
@@ -12,19 +12,19 @@
     </header>
 
     <nav>
-      <form method="post" action="http://car-rental.test/customers">
+      <form method="post" action="{{ baseUrl }}/customers">
         <input type="submit" value="Customers">
       </form>
-      <form method="post" action="http://car-rental.test/cars">
+      <form method="post" action="{{ baseUrl }}/cars">
         <input type="submit" value="Cars">
       </form>
-      <form method="post" action="http://car-rental.test/checkout">
+      <form method="post" action="{{ baseUrl }}/checkout">
         <input type="submit" value="Check out car">
       </form>
-      <form method="post" action="http://car-rental.test/checkin">
+      <form method="post" action="{{ baseUrl }}/checkin">
         <input type="submit" value="Check in car">
       </form>
-      <form method="post" action="http://car-rental.test/history">
+      <form method="post" action="{{ baseUrl }}/history">
         <input type="submit" value="History">
       </form>
     </nav>
@@ -34,6 +34,6 @@
       {% block content %}{% endblock %}
     </main>
 
-    <script src="http://car-rental.test/js/main.js"></script>
+    <script src="{{ baseUrl }}/js/main.js"></script>
   </body>
 </html>

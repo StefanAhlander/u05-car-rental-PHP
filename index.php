@@ -27,6 +27,7 @@ use Main\Utils\DependencyInjector;
    */
   $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . "/src/Views");
   $twig = new \Twig\Environment($loader);
+  $twig->addGlobal('baseUrl', $config->get('baseUrl'));
 
   /**
    * The dependency injector is instantiated and populated with the database connection,
