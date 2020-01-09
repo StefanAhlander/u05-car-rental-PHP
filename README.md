@@ -24,7 +24,7 @@ You should be good to go.
 https://aahlander.se/u05-car-rental/
 
 ## Documentation
-As part of the assignement a short repport is included in the main folder. The code is also extensibly
+As part of the assignement a short report is included in the main folder. The code is also extensibly
 commented and should be fairly easy to follow.
 
 ## License:
