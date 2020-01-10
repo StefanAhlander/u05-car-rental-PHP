@@ -64,15 +64,21 @@ class Car {
     return $this->checkedouttime;
   }
 
+  public function setCheckedOutBy($value) {
+    return $this->checkedoutby = $value;
+  }
+
+  public function setCheckedOutTime($value) {
+    return $this->checkedouttime = $value;
+  }
+
   // Method to get object properties and create an associative array.
-  public function toArray() {
+  public function transformToDatabaseAppropriateArray() {
     $arr["registration"] = $this->registration;
     $arr["make"] = $this->make;
     $arr["color"] = $this->color;
     $arr["year"] = $this->year;
     $arr["price"] = $this->price;
-    $arr["checkedoutby"] = $this->checkedoutby;
-    $arr["checkedouttime"] = $this->checkedouttime;
 
     return $arr;
   }

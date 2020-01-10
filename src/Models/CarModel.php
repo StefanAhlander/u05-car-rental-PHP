@@ -52,7 +52,10 @@ class CarModel extends DataModel {
    * @return  { Array of new Car objects.}
    */
   public function getAllNotRented() {
-    $results = parent::executeQuery('SELECT * FROM cars WHERE checkedoutby IS NULL ORDER BY make');
+    $results = parent::executeQuery('SELECT *  FROM cars 
+      WHERE cars.registration NOT IN 
+      (SELECT cars.registration FROM cars LEFT JOIN rentals 
+      ON cars.registration = rentals.registration WHERE checkouttime IS NOT NULL AND checkintime IS NULL)');
 
     foreach($results as $result) {
       $cars[] = new Car($result);
@@ -68,7 +71,9 @@ class CarModel extends DataModel {
    * @return  { Array of new Car objects.}
    */
   public function getAllRented() {
-    $results = parent::executeQuery('SELECT * FROM cars WHERE checkedoutby IS NOT NULL ORDER BY make');
+    $results = parent::executeQuery('SELECT cars.registration, make, color, year, price, personnumber AS checkedoutby, 
+    checkouttime AS checkedouttime  FROM cars LEFT JOIN rentals ON cars.registration = rentals.registration 
+    WHERE checkouttime IS NOT NULL AND checkintime IS NULL');
 
     $cars = [];
     
@@ -89,11 +94,11 @@ class CarModel extends DataModel {
    */
   public function create($car) {
     $query = <<<SQL
-INSERT INTO cars(registration, make, color, year, price, checkedoutby, checkedouttime)
-VALUES(:registration, :make, :color, :year, :price, :checkedoutby, :checkedouttime)
+INSERT INTO cars(registration, make, color, year, price)
+VALUES(:registration, :make, :color, :year, :price)
 SQL;
 
-    $specs = $car->toArray();
+    $specs = $car->transformToDatabaseAppropriateArray();
     
     parent::insertOrUpdateGeneric($query, $specs);
 
@@ -111,11 +116,11 @@ SQL;
   public function edit($car) {
     $query = <<<SQL
 UPDATE cars
-SET make=:make, color=:color, year=:year, price=:price, checkedoutby=:checkedoutby, checkedouttime=:checkedouttime
+SET make=:make, color=:color, year=:year, price=:price
 WHERE registration=:registration
 SQL;
 
-    $specs = $car->toArray();
+    $specs = $car->transformToDatabaseAppropriateArray();
         
     parent::insertOrUpdateGeneric($query, $specs);
 

@@ -52,11 +52,15 @@ class Customer {
     return $this->renting;
   }
 
+  public function setRenting() {
+    return $this->renting = TRUE;
+  }
+
   /**
    * Method to get object properties and create an associative array.
    * For use in ombination with calls to Model-methods.
    */
-  public function toArray() {
+  public function transformToDatabaseAppropriateArray() {
     $arr["personnumber"] = $this->personnumber;
     $arr["name"] = $this->name;
     $arr["address"] = $this->address;

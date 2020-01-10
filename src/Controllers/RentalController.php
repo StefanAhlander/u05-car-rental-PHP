@@ -54,7 +54,7 @@ class RentalController extends ParentController {
     $fM =  new FilteredMap($this->request->getForm());
     $personnumber = $fM->getInt("personnumber");
     $registration = $fM->getString("registration");
-
+    
     try {
       $id = $rentalModel->createRental($personnumber, $registration);
     } catch (\Exception $e) {

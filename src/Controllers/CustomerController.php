@@ -16,8 +16,11 @@ class CustomerController extends ParentController {
    * Instantiate the CustomerModel object and call it's getAll function. 
    * If there is an error calling the CustomerModel method populate the
    * 'properies' variable with an error message and render the 
-   * error view using Twig. If there is no error use the returned array
-   * to populate the 'customers' view using Twig. 
+   * error view using Twig. 
+   * Call a method to get all customers who are currently renting a
+   * car. Loop over the results and combine these with the previous
+   * list of all customers to get the complete customer objects to render on screen. 
+   * Pass the list of customers to the render method of Twig.
    */
   public function getAll() {
     $customerModel = new CustomerModel($this->db);
@@ -27,6 +30,21 @@ class CustomerController extends ParentController {
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error getting customers from Controller.'];
       return $this->render('error.twig', $properties);
+    }
+    
+    try {
+      $renters = $customerModel->getAllRenting();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting all renters from Controller.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    foreach($renters as $renter) {
+      foreach($customers as $customer) {
+        if ($renter->getPersonNumber() == $customer->getPersonNumber()) {
+          $customer->setRenting();
+        }
+      }
     }
 
     $properties = ['customers' => $customers];

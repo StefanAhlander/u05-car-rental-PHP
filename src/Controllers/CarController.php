@@ -16,8 +16,10 @@ class CarController extends ParentController {
    * Instantiate the CarModel object and call it's getAll function. 
    * If there is an error calling the CarModel method populate the
    * 'properies' variable with an error message and render the 
-   * error view using Twig. If there is no error use the returned array
-   * to populate the 'cars' view using Twig. 
+   * error view using Twig. 
+   * Call a method to get all currently rented cars. Loop over the results
+   * and combine these with the prvious results to create the complete 
+   * car objects to pass to the render method of Twig. 
    */
   public function getAll() {
     $carModel = new CarModel($this->db);
@@ -27,6 +29,22 @@ class CarController extends ParentController {
     } catch (\Exception $e) {
       $properties = ['errorMessage' => 'Error getting cars from Controller.'];
       return $this->render('error.twig', $properties);
+    }
+
+    try {
+      $allRented = $carModel->getAllRented();
+    } catch (\Exception $e) {
+      $properties = ['errorMessage' => 'Error getting all rented from Controller.'];
+      return $this->render('error.twig', $properties);
+    }
+
+    foreach($allRented as $rented) {
+      foreach($cars as $car) {
+        if ($rented->getRegistration() == $car->getRegistration()) {
+          $car->setCheckedOutBy($rented->getCheckedOutBy());
+          $car->setCheckedOutTime($rented->getCheckedOutTime());
+        }
+      }
     }
 
     $properties = ['cars' => $cars];

@@ -45,6 +45,25 @@ class CustomerModel extends DataModel {
 
     return $customers;
   }
+ 
+  /**
+   * Get all customers that are currently renting calling parent class
+   * executeQuery method. 
+   * 
+   * @return  { Array of new Customer objects.}
+   */
+  public function getALLRenting() {
+    $results = parent::executeQuery('SELECT customers.personnumber, name, address, postaladdress, phonenumber  FROM customers LEFT JOIN rentals 
+    ON customers.personnumber = rentals.personnumber WHERE checkouttime IS NOT NULL AND checkintime IS NULL');
+
+    $renters = [];
+    
+    foreach($results as $result) {
+      $renters[] = new Customer($result);
+    }
+
+    return $renters;
+  }
 
   /**
    * Insert (create) new customer in the customers table by calling the parent class
@@ -56,11 +75,11 @@ class CustomerModel extends DataModel {
    */
   public function create($customer) {
     $query = <<<SQL
-INSERT INTO customers(personnumber, name, address, postaladdress, phonenumber, renting)
-VALUES(:personnumber, :name, :address, :postaladdress, :phonenumber, FALSE)
+INSERT INTO customers(personnumber, name, address, postaladdress, phonenumber)
+VALUES(:personnumber, :name, :address, :postaladdress, :phonenumber)
 SQL;
 
-    $specs = $customer->toArray();
+    $specs = $customer->transformToDatabaseAppropriateArray();
     
     parent::insertOrUpdateGeneric($query, $specs);
 
@@ -78,11 +97,11 @@ SQL;
   public function edit($customer) {
     $query = <<<SQL
 UPDATE customers
-SET name=:name, address=:address, postaladdress=:postaladdress, phonenumber=:phonenumber, renting=FALSE
+SET name=:name, address=:address, postaladdress=:postaladdress, phonenumber=:phonenumber
 WHERE personnumber=:personnumber
 SQL;
 
-    $specs = $customer->toArray();
+    $specs = $customer->transformToDatabaseAppropriateArray();
 
     parent::insertOrUpdateGeneric($query, $specs);
 

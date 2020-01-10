@@ -7,8 +7,7 @@ CREATE TABLE customers(
   name VARCHAR(255) NOT NULL,
   address VARCHAR(255) NOT NULL,
   postaladdress VARCHAR(255) NOT NULL,
-  phonenumber VARCHAR(10) NOT NULL,
-  renting BOOLEAN NOT NULL
+  phonenumber VARCHAR(10) NOT NULL
 ) ENGINE=InnoDb;
 
 CREATE TABLE cars(
@@ -16,10 +15,7 @@ CREATE TABLE cars(
   make VARCHAR(100) NOT NULL,
   color VARCHAR(20) NOT NULL,
   year INT NOT NULL,
-  price INT NOT NULL,
-  checkedoutby BIGINT,
-  checkedouttime DATETIME,
-  FOREIGN KEY (checkedoutby) REFERENCES customers(personnumber)
+  price INT NOT NULL
 ) ENGINE=InnoDb;
 
 CREATE TABLE rentals(
@@ -34,17 +30,17 @@ CREATE TABLE rentals(
   FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
-INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber, renting) VALUES
-  (199309230465, "Lisa Andersson", "Storgatan 2", "45656 Småstad", "0775343455", false),
-  (197002101207, "Mohammad Rezai", "Stackvägen 12", "75646 Uppsala", "0708118825", false),
-  (197804282338, "Ali Boraoui", "Hässjevägen 3", "75647 Uppsala", "0722345678", false),
-  (198807280030, "Petri Lejerdahl", "August Södermans väg 9", "75645 Uppsala", "0725999988", false),
-  (194604279796, "Mona Karlsson", "Stenbrohultsvägen 107", "75754 Uppsala", "0737882211", false),
-  (195704143295, "Mario Garcia", "Valhallavägen 52", "11414 Stockholm", "0722994450", false),
-  (197405314563, "Lovisa Larsson", "Glimmerstigen 11", "45776 Granitbyn", "0711959545", false),
-  (196302254344, "Helena Janols", "Drottninggatan 20", "86040 Sundsvall", "0703454545", false),
-  (197302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", "0704979766", false),
-  (198007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", "0725100580", false);
+INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber) VALUES
+  (199309230465, "Lisa Andersson", "Storgatan 2", "45656 Småstad", "0775343455"),
+  (197002101207, "Mohammad Rezai", "Stackvägen 12", "75646 Uppsala", "0708118825"),
+  (197804282338, "Ali Boraoui", "Hässjevägen 3", "75647 Uppsala", "0722345678"),
+  (198807280030, "Petri Lejerdahl", "August Södermans väg 9", "75645 Uppsala", "0725999988"),
+  (194604279796, "Mona Karlsson", "Stenbrohultsvägen 107", "75754 Uppsala", "0737882211"),
+  (195704143295, "Mario Garcia", "Valhallavägen 52", "11414 Stockholm", "0722994450"),
+  (197405314563, "Lovisa Larsson", "Glimmerstigen 11", "45776 Granitbyn", "0711959545"),
+  (196302254344, "Helena Janols", "Drottninggatan 20", "86040 Sundsvall", "0703454545"),
+  (197302271452, "Stefan Åhlander", "Lapplandsresan 25 B", "75755 Uppsala", "0704979766"),
+  (198007271482, "Maria Erlandsson", "Lapplandsresan 25 B", "75755 Uppsala", "0725100580");
 
 INSERT INTO cars (registration, make, color, year, price) VALUES
   ("LST364", "Volvo", "Blue", 2019, 700),

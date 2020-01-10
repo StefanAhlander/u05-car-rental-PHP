@@ -4,11 +4,10 @@ namespace Main\Models;
 
 use Main\Domain\Rental;
 use Main\Domain\Car;
-use Exception;
 
 /**
  * Class for handling primarily transactions with the database on table rentals. 
- * Some complicatded transactions affecting the cars and customers tables are also handled
+ * Some complicatded transactions affecting the cars tables are also handled
  * here because they are part of larger operations involving multiple tables.
  */
 class RentalModel extends DataModel {
@@ -51,36 +50,12 @@ class RentalModel extends DataModel {
 
   /**
    * Create and store a new rental transaction.
-   * Aslo updates the customers and cars tables.
    * 
    * @param { $personnumber = person number of the customer who is
    *                          renting. 
    *          $registration = licens plate of the rented car.}
    */
   public function createRental($personnumber, $registration) {
-    // Start transaction so all changes can be rolled back if something goes wrong.
-    $this->db->beginTransaction();
-
-    // Set renting value as true in the customers table.
-    $query = <<<SQL
-UPDATE customers SET renting = true 
-WHERE personnumber = :personnumber
-SQL;
-
-    $specs = ["personnumber" => $personnumber];
-    $this->executeInsertOrUpdate($query, $specs);
-
-    // Updates the cars table with information about who and at what time a car was checked out.
-    $query = <<<SQL
-UPDATE cars SET checkedoutby = :personnumber,
-  checkedouttime = CONVERT_TZ(NOW(),  @@session.time_zone, "Europe/Stockholm")
-WHERE registration = :registration
-SQL;
-
-    $specs = ["personnumber" => $personnumber,
-              "registration" => $registration];
-    $this->executeInsertOrUpdate($query, $specs);
-
     // Create a new rental transaction in the rentals table.
     $query = <<<SQL
 INSERT INTO rentals (registration, personnumber, checkouttime, checkintime, days, cost)
@@ -91,15 +66,11 @@ SQL;
               "registration" => $registration];
     $id = $this->executeInsertOrUpdate($query, $specs);
 
-    // Commit all transactions and return id for the new rental.
-    $this->db->commit();
-
     return $id;
   }
 
   /**
    * Close a currently open rental transaction.
-   * Aslo updates the customers and cars tables.
    * 
    * @param { $registration = licens plate of the rented car.}
    */
@@ -113,8 +84,6 @@ SQL;
     $rental = new Rental($this->getGeneric($specs, $amendBy));
 
     $id = $rental->getID();
-    $personnumber = $rental->getPersonNumber();
-    $registration = $rental->getRegistration();
             
     //  Get info about the car from the cars table to get the rental price.
     $specs = ["table" => "cars",
@@ -127,33 +96,6 @@ SQL;
 
     //  Start transaction.
     $this->db->beginTransaction();
-
-    //  If customer is renting less than two cars update customer table to show the customer as not renting.
-    $query = "SELECT COUNT(personnumber) FROM rentals WHERE personnumber = " . $personnumber;
-
-    $specs = ["table" => "rentals",
-              "column" => "personnumber",
-              "value" => $personnumber];
-    $amendBy = " AND checkintime IS NULL";
-
-    $results = parent::executeQuery($query, $specs, $amendBy);
-
-    if (count($results) == 0) {
-      throw new Exception("The customer is not registered as renting. RentalModel->closeRental");
-    }
-
-    if ($results[0][0] < 2) {
-      $query = "UPDATE customers SET renting = false WHERE personnumber = :personnumber";
-      
-      $specs = ["personnumber" => $personnumber];
-      parent::insertOrUpdateGeneric($query, $specs);
-    }
-
-    //  Set the car as not being checked out.
-    $query = "UPDATE cars SET checkedoutby = NULL, checkedouttime = NULL WHERE registration = :registration";
-
-    $specs = ["registration" => $registration];
-    $this->executeInsertOrUpdate($query, $specs);
 
     //  Set the checkin time in rentals table.
     $query = <<<SQL
