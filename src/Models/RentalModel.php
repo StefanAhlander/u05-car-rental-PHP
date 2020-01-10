@@ -11,8 +11,6 @@ use Main\Domain\Car;
  * here because they are part of larger operations involving multiple tables.
  */
 class RentalModel extends DataModel {
-  const CLASSNAME_RENTAL = '\Main\Domain\Rental';
-  const CLASSNAME_CAR = '\Main\Domain\Car';
 
   /**
    * Get a specific rental transaction by id. 

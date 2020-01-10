@@ -10,7 +10,6 @@ use Main\Domain\Customer;
  * for communication with the database.
  */
 class CustomerModel extends DataModel {
-  const CLASSNAME = "\Main\Domain\Customer";
 
   /**
    * Get ustomers by calling parent class get method. 

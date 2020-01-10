@@ -30,6 +30,14 @@ CREATE TABLE rentals(
   FOREIGN KEY (personnumber) REFERENCES customers(personnumber)
 ) ENGINE=InnoDb;
 
+CREATE TABLE makes(
+  make VARCHAR(100) NOT NULL
+) ENGINE=InnoDb;
+
+CREATE TABLE colors(
+  color VARCHAR(100) NOT NULL
+) ENGINE=InnoDb;
+
 INSERT INTO customers (personnumber, name, address, postaladdress, phonenumber) VALUES
   (199309230465, "Lisa Andersson", "Storgatan 2", "45656 Småstad", "0775343455"),
   (197002101207, "Mohammad Rezai", "Stackvägen 12", "75646 Uppsala", "0708118825"),
@@ -53,14 +61,6 @@ INSERT INTO cars (registration, make, color, year, price) VALUES
   ("PDF110", "Hyundai", "Yellow", 2017, 450),
   ("LSW364", "Toyota", "Gray", 2012, 300),
   ("DOL990", "Toyota", "Red", 2011, 200);
-
-CREATE TABLE makes(
-  make VARCHAR(100) NOT NULL
-) ENGINE=InnoDb;
-
-CREATE TABLE colors(
-  color VARCHAR(100) NOT NULL
-) ENGINE=InnoDb;
 
 INSERT INTO makes (make) VALUES
   ("Peugeot"),
