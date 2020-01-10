@@ -76,9 +76,10 @@ const validateMethods = {
   },
   registration(elt) {
     let returnMessage = '';
-    elt.value = elt.value.replace(/[a-z]/gi, l => l.toUpperCase());
+    let num = (elt.value = elt.value
+      .replace(/[a-z]/gi, l => l.toUpperCase())
+      .elt.value.replace(/[-\s]/g, ''));
 
-    let num = elt.value.replace(/[-\s]/g, '');
     if (!/^[a-hj-pr-uw-z]{3}\d{2}[a-hj-npr-uw-z0-9]{1}$/i.test(num)) {
       returnMessage += `The registration doesn\'t comply with Swedish standards.\n`;
     }
