@@ -2,3 +2,11 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /u05-car-rental/index.php?path=$1 [NC,L,QSA]
+
+
+<Files ~ "\.json$">
+Order allow,deny
+Deny from all
+</Files>
+
+Options -Indexes
