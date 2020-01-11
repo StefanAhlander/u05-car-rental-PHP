@@ -33,10 +33,23 @@ class CarModel extends DataModel {
    * @return  { Array of new Car objects.}
    */
   public function getAll() {
-    $results = parent::getAllGeneric([
+    $query = <<<SQL
+      SELECT registration, make, color, year, price,
+      IF ((SELECT personnumber FROM rentals WHERE cars.registration = rentals.registration AND checkouttime IS NOT NULL AND checkintime IS NULL) 
+      IS NOT NULL, (SELECT personnumber FROM rentals WHERE cars.registration = rentals.registration AND checkouttime IS NOT NULL AND checkintime IS NULL), NULL) 
+      AS checkedoutby, 
+      IF ((SELECT checkouttime FROM rentals WHERE cars.registration = rentals.registration AND checkouttime IS NOT NULL AND checkintime IS NULL) 
+      IS NOT NULL, (SELECT checkouttime FROM rentals WHERE cars.registration = rentals.registration AND checkouttime IS NOT NULL AND checkintime IS NULL), NULL) 
+      AS checkedouttime 
+      FROM cars
+SQL;
+
+    $specs = [
       "table" => "cars",
       "order" => "make"
-    ]);
+    ];
+
+    $results = parent::executeQuery($query, $specs);
 
     foreach($results as $result) {
       $cars[] = new Car($result);

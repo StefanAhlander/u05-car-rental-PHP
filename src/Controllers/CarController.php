@@ -31,22 +31,6 @@ class CarController extends ParentController {
       return $this->render('error.twig', $properties);
     }
 
-    try {
-      $allRented = $carModel->getAllRented();
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting all rented from Controller.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    foreach($allRented as $rented) {
-      foreach($cars as $car) {
-        if ($rented->getRegistration() == $car->getRegistration()) {
-          $car->setCheckedOutBy($rented->getCheckedOutBy());
-          $car->setCheckedOutTime($rented->getCheckedOutTime());
-        }
-      }
-    }
-
     $properties = ['cars' => $cars];
     return $this->render('cars.twig', $properties);
   }

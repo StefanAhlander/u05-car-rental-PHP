@@ -33,35 +33,26 @@ class CustomerModel extends DataModel {
    * @return  { Array of new Customer objects.}
    */
   public function getAll() {
-    $results = parent::getAllGeneric([
+    $query = <<<SQL
+      SELECT personnumber, name, address, postaladdress, phonenumber,
+      IF ((SELECT checkouttime FROM rentals 
+      WHERE customers.personnumber = rentals.personnumber 
+      AND checkouttime IS NOT NULL AND checkintime IS NULL) 
+      IS NOT NULL, TRUE, FALSE) AS renting FROM customers
+SQL;
+    
+    $specs = [
       "table" => "customers",
       "order" => "name"
-    ]);
+    ];
+
+    $results = parent::executeQuery($query, $specs);
 
     foreach($results as $result) {
       $customers[] = new Customer($result);
     }
 
     return $customers;
-  }
- 
-  /**
-   * Get all customers that are currently renting calling parent class
-   * executeQuery method. 
-   * 
-   * @return  { Array of new Customer objects.}
-   */
-  public function getALLRenting() {
-    $results = parent::executeQuery('SELECT customers.personnumber, name, address, postaladdress, phonenumber  FROM customers LEFT JOIN rentals 
-    ON customers.personnumber = rentals.personnumber WHERE checkouttime IS NOT NULL AND checkintime IS NULL');
-
-    $renters = [];
-    
-    foreach($results as $result) {
-      $renters[] = new Customer($result);
-    }
-
-    return $renters;
   }
 
   /**

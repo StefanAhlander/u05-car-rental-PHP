@@ -31,21 +31,6 @@ class CustomerController extends ParentController {
       $properties = ['errorMessage' => 'Error getting customers from Controller.'];
       return $this->render('error.twig', $properties);
     }
-    
-    try {
-      $renters = $customerModel->getAllRenting();
-    } catch (\Exception $e) {
-      $properties = ['errorMessage' => 'Error getting all renters from Controller.'];
-      return $this->render('error.twig', $properties);
-    }
-
-    foreach($renters as $renter) {
-      foreach($customers as $customer) {
-        if ($renter->getPersonNumber() == $customer->getPersonNumber()) {
-          $customer->setRenting();
-        }
-      }
-    }
 
     $properties = ['customers' => $customers];
     //die(var_dump($properties));
