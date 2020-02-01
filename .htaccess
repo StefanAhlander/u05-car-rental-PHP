@@ -1,7 +1,7 @@
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /u05-car-rental/index.php?path=$1 [NC,L,QSA]
+RewriteRule ^(.*)$ http://localhost/Develop/projects/test/u05-car-rental/index.php?path=$1 [NC,L,QSA]
 
 
 <Files ~ "\.json$">

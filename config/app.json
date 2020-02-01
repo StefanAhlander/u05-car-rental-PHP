@@ -1,9 +1,9 @@
 {
   "db": {
     "host": "127.0.0.1",
-    "dbname": "CarRental",
+    "dbname": "carrental",
     "user": "homestead",
     "password": "secret"
   },
-  "baseUrl": "http://car-rental.test"
+  "baseUrl": "http://localhost/Develop/projects/test/u05-car-rental"
 }

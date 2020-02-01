@@ -42,7 +42,8 @@ class Router {
 
     foreach ($this->routeMap as $route => $info) {
       $regexRoute = $this->getRegexRoute($route, $info);
-      if (preg_match("@^/$regexRoute$@", $path)) {
+
+      if (preg_match("@/$regexRoute$@", $path)) {
         return $this->executeController($route, $path, $info, $request);
       }
     }
@@ -62,7 +63,6 @@ class Router {
         $route = str_replace(':' . $name, self::$regexPatters[$type], $route);
       }
     }
-
     return $route;
   }
 

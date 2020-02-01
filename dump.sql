@@ -1,6 +1,6 @@
-DROP database IF EXISTS CarRental;
-CREATE database CarRental CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE CarRental;
+DROP database IF EXISTS carrental;
+CREATE database carrental CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE carrental;
 
 CREATE TABLE customers(
   personnumber BIGINT PRIMARY KEY,
